@@ -1,0 +1,7 @@
+/Datahub-Factory-VKC-*
+/.build
+/_build*
+/Build
+MYMETA.*
+!META.json
+/.prove

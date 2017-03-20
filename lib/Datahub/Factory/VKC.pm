@@ -1,18 +1,7 @@
-package Datahub::Factory::Importer::VKC;
+package Datahub::Factory::VKC;
 
 use strict;
-use warnings;
-
 our $VERSION = '0.01';
-
-use Moo;
-use Catmandu;
-
-with 'Datahub::Factory::Importer';
-
-sub _build_importer {
-    my $self = shift;
-}
 
 1;
 __END__
