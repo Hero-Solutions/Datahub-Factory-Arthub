@@ -49,7 +49,21 @@
       }
    },
    "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/thedatahub/Datahub-Factory-PIDS/issues"
+      },
+      "homepage" : "https://github.com/thedatahub/Datahub-Factory-PIDS",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/thedatahub/Datahub-Factory-PIDS.git",
+         "web" : "https://github.com/thedatahub/Datahub-Factory-PIDS"
+      }
+   },
    "version" : "0.0.1",
+   "x_contributors" : [
+      "Pieter De Praetere <pieter@packed.be>"
+   ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 
