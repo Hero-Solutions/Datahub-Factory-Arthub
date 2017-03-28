@@ -5,3 +5,6 @@
 MYMETA.*
 !META.json
 /.prove
+/Datahub-Factory-KMSKA-*
+/Datahub-Factory-MSK-*
+/Datahub-Factory-PIDS-*

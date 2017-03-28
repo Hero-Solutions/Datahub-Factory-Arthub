@@ -1,6 +1,4 @@
 Revision history for Datahub-Factory-VKC
 
 {{$NEXT}}
-
-0.01  2017-03-20 13:46:18 UTC
-        - Initial release
+        - Initial release (merge of Datahub::Factory::KMSKA, Datahub::Factory::MSK, Datahub::Factory::PIDS and Datahub::Factory::VKC)

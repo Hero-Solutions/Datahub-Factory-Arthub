@@ -1,5 +1,5 @@
 {
-   "abstract" : "Import data from the L<CollectiveAccess|http://collectiveaccess.org/> instance of the L<VKC|http://www.vlaamsekunstcollectie.be/>",
+   "abstract" : "Datahub-Factory modules for the VKC Arthub.",
    "author" : [
       "Pieter De Praetere <pieter at packed.be >"
    ],
@@ -12,7 +12,7 @@
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : 2
    },
-   "name" : "Datahub-Factory-VKC",
+   "name" : "Datahub-Factory-Arthub",
    "no_index" : {
       "directory" : [
          "eg",
@@ -51,13 +51,13 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/thedatahub/Datahub-Factory-VKC/issues"
+         "web" : "https://github.com/thedatahub/Datahub-Factory-Arthub/issues"
       },
-      "homepage" : "https://github.com/thedatahub/Datahub-Factory-VKC",
+      "homepage" : "https://github.com/thedatahub/Datahub-Factory-Arthub",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/thedatahub/Datahub-Factory-VKC.git",
-         "web" : "https://github.com/thedatahub/Datahub-Factory-VKC"
+         "url" : "https://github.com/thedatahub/Datahub-Factory-Arthub.git",
+         "web" : "https://github.com/thedatahub/Datahub-Factory-Arthub"
       }
    },
    "version" : "0.01",
