@@ -1,5 +1,5 @@
 {
-   "abstract" : "Datahub-Factory modules for the VKC Arthub.",
+   "abstract" : "Modules used for the VKC Arthub.",
    "author" : [
       "Pieter De Praetere <pieter at packed.be >"
    ],
@@ -38,7 +38,6 @@
       "runtime" : {
          "requires" : {
             "Datahub::Factory" : "0",
-            "Datahub::Factory::Importer::PIDS" : "0",
             "perl" : "5.008005"
          }
       },
