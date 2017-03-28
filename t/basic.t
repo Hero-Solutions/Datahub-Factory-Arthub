@@ -1,6 +1,6 @@
 use strict;
 use Test::More;
-use Datahub::Factory::VKC;
+use Datahub::Factory::Arthub;
 
 # replace with the actual test
 ok 1;

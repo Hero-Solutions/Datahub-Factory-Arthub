@@ -1,5 +1,5 @@
 {
-   "abstract" : "Modules used for the VKC Arthub.",
+   "abstract" : "modules for the L<VKC Arthub|>",
    "author" : [
       "Pieter De Praetere <pieter at packed.be >"
    ],
@@ -50,17 +50,18 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/thedatahub/Datahub-Factory-Arthub/issues"
+         "web" : "https://github.com/thedatahub/Datahub-Factory-VKC/issues"
       },
-      "homepage" : "https://github.com/thedatahub/Datahub-Factory-Arthub",
+      "homepage" : "https://github.com/thedatahub/Datahub-Factory-VKC",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/thedatahub/Datahub-Factory-Arthub.git",
-         "web" : "https://github.com/thedatahub/Datahub-Factory-Arthub"
+         "url" : "https://github.com/thedatahub/Datahub-Factory-VKC.git",
+         "web" : "https://github.com/thedatahub/Datahub-Factory-VKC"
       }
    },
    "version" : "0.01",
    "x_contributors" : [
+      "Pieter De Praetere <pieter.de.praetere@helptux.be>",
       "Pieter De Praetere <pieter@packed.be>"
    ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
