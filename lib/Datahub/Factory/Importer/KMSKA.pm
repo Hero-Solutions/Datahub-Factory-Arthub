@@ -8,7 +8,7 @@ use Catmandu;
 
 use Config::Simple;
 
-use Datahub::Factory::TMS::Import;
+use Datahub::Factory::Importer::TMS::Index;
 use Datahub::Factory::Importer::PIDS;
 
 with 'Datahub::Factory::Importer';
@@ -18,34 +18,23 @@ has db_name     => (is => 'ro', required => 1);
 has db_user     => (is => 'ro', required => 1);
 has db_password => (is => 'ro', required => 1);
 
-has importer => (is => 'lazy');
 has tms      => (is => 'lazy');
-has pids     => (is => 'lazy');
 
 sub _build_importer {
     my $self = shift;
-    my $importer = $self->tms->importer;
-    $self->prepare();
-    return $importer
-}
-
-sub _build_tms {
-    my $self = shift;
-    my $tms = Datahub::Factory::TMS::Import->new(
-        db_host     => $self->db_host,
-        db_name     => $self->db_name,
-        db_user     => $self->db_user,
+    my $dsn = sprintf('dbi:mysql:%s', $self->db_name);
+    # Add indices
+    $self->logger->info('Creating indices on TMS tables.');
+    Datahub::Factory::Importer::TMS::Index->new(
+        db_host => $self->db_host,
+        db_name => $self->db_name,
+        db_user => $self->db_user,
         db_password => $self->db_password
     );
-    return $tms;
-}
-
-sub _build_pids {
-    my $self = shift;
-    return Datahub::Factory::Importer::PIDS->new(
-        username => $self->config->param('PIDS.username'),
-        api_key  => $self->config->param('PIDS.api_key')
-    );
+    my $query = 'select * from vgsrpObjTombstoneD_RO;';
+    my $importer = Catmandu->importer('DBI', dsn => $dsn, host => $self->db_host, user => $self->db_user, password => $self->db_password, query => $query, encoding => ':iso-8859-1');
+    $self->prepare();
+    return $importer
 }
 
 sub prepare {
@@ -59,10 +48,6 @@ sub prepare {
     $self->__dimensions();
     $self->logger->info('Adding "subjects" temporary table.');
     $self->__subjects();
-    $self->logger->info('Creating "pids" temporary table.');
-    $self->__pids();
-    $self->logger->info('Creating "creators" temporary table.');
-    $self->__creators();
 }
 
 sub prepare_call {
@@ -163,17 +148,6 @@ sub __subjects {
     y.ThesXrefTypeID = 30;"; # Only those from the VKC website
     $self->merge_call($query, 'subjects', 'subjects');
 }
-
-sub __pids {
-    my $self = shift;
-    $self->pids->temporary_table($self->pids->get_object('PIDS_KMSKA_UTF8.csv'), 'export20131204 - ID');
-}
-
-sub __creators {
-    my $self = shift;
-    $self->pids->temporary_table($self->pids->get_object('CREATORS_KMSKA_UTF8.csv'));
-}
-
 1;
 __END__
 
