@@ -9,7 +9,6 @@ use Catmandu;
 use Config::Simple;
 
 use Datahub::Factory::Importer::TMS::Index;
-use Datahub::Factory::Importer::PIDS;
 
 with 'Datahub::Factory::Importer';
 
@@ -48,6 +47,8 @@ sub prepare {
     $self->__dimensions();
     $self->logger->info('Adding "subjects" temporary table.');
     $self->__subjects();
+    $self->logger->info('Adding "pids" temporary table.');
+    $self->__pids();
 }
 
 sub prepare_call {
@@ -113,7 +114,13 @@ sub __classifications {
 
 sub __period {
     my $self = shift;
-    $self->prepare_call('select ObjectID as _id, Period as term from ObjContext', 'periods')
+    $self->prepare_call('select ObjectID as _id, Period as term from ObjContext', 'periods');
+}
+
+sub __pids {
+    my $self = shift;
+    # key is object_number
+    $self->prepare_call('select ObjectNumber as _id, workPidURI as workPid, dataPidURI as dataPid from Cit_KMSKApids_conversie_gecorrigeerd', 'Cit_KMSKApids_conversie_gecorrigeerd');
 }
 
 sub __dimensions {
