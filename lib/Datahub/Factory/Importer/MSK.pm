@@ -11,20 +11,22 @@ use Data::Dumper qw(Dumper);
 use Datahub::Factory;
 
 use Datahub::Factory::Importer::Adlib;
-use Datahub::Factory::Importer::PIDS;
 
 with 'Datahub::Factory::Importer';
 
-has file_name         => (is => 'ro', required => 1);
-has data_path         => (is => 'ro', default => sub { return 'recordList.record.*'; });
-has resolver_url      => (is => 'ro', default => sub { return 'http://www.resolver.be' });
-has resolver_username => (is => 'ro', required => 1);
-has resolver_password => (is => 'ro', required => 1);
-has pids_username     => (is => 'ro', required => 1);
-has pids_api_key      => (is => 'ro', required => 1);
+has file_name          => (is => 'ro', required => 1);
+has data_path          => (is => 'ro', default => sub { return 'recordList.record.*'; });
+has resolver_url       => (is => 'ro', default => sub { return 'http://www.resolver.be' });
+has resolver_username  => (is => 'ro', required => 1);
+has resolver_password  => (is => 'ro', required => 1);
+has pid_module         => (is => 'ro', default => 'lwp');
+has pid_username       => (is => 'ro');
+has pid_password       => (is => 'ro');
+has pid_lwp_realm      => (is => 'ro');
+has pid_lwp_url        => (is => 'ro');
+has rcf_container_name => (is => 'ro');
 
 has adlib    => (is => 'lazy');
-has pids     => (is => 'lazy');
 
 sub _build_importer {
     my $self = shift;
@@ -42,14 +44,6 @@ sub _build_adlib {
     return $adlib;
 }
 
-sub _build_pids {
-    my $self = shift;
-    return Datahub::Factory::Importer::PIDS->new(
-        username => $self->pids_username,
-        api_key  => $self->pids_api_key
-    );
-}
-
 sub prepare {
     my $self = shift;
     $self->logger->info('Creating "pids" temporary table.');
@@ -62,17 +56,38 @@ sub prepare {
 
 sub __pids {
     my $self = shift;
-    $self->pids->temporary_table($self->pids->get_object('PIDS_MSK_UTF8.csv'));
+    my $pid = Datahub::Factory->module('PID')->new(
+        pid_module         => $self->pid_module,
+        pid_username       => $self->pid_username,
+        pid_password       => $self->pid_password,
+        rcf_container_name => $self->rcf_container_name,
+        rcf_object         => 'PIDS_MSK_UTF8.csv'
+    );
+    $pid->temporary_table($pid->path);
 }
 
 sub __creators {
     my $self = shift;
-    $self->pids->temporary_table($self->pids->get_object('CREATORS_MSK_UTF8.csv'));
+    my $pid = Datahub::Factory->module('PID')->new(
+        pid_module         => $self->pid_module,
+        pid_username       => $self->pid_username,
+        pid_password       => $self->pid_password,
+        rcf_container_name => $self->rcf_container_name,
+        rcf_object         => 'CREATORS_MSK_UTF8.csv'
+    );
+    $pid->temporary_table($pid->path);
 }
 
 sub __aat {
     my $self = shift;
-    $self->pids->temporary_table($self->pids->get_object('AAT_UTF8.csv'), 'record - object_name');
+    my $pid = Datahub::Factory->module('PID')->new(
+        pid_module         => $self->pid_module,
+        pid_username       => $self->pid_username,
+        pid_password       => $self->pid_password,
+        rcf_container_name => $self->rcf_container_name,
+        rcf_object         => 'AAT_UTF8.csv'
+    );
+    $pid->temporary_table($pid->path, 'record - object_name');
 }
 
 1;

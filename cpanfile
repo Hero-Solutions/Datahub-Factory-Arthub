@@ -6,3 +6,5 @@ on test => sub {
 	    requires 'Test::More', '0.96';
 };
 requires 'Datahub::Factory';
+requires 'URI::Split';
+requires 'LWP::UserAgent';
