@@ -24,7 +24,7 @@ It contains the following packages:
 
 =item L<Datahub::Factory::Importer::MSK>
 
-=item L<Datahub::Factory::Importer::PIDS>
+=item L<Datahub::Factory::Module::PID>
 
 =item L<Datahub::Factory::Importer::VKC>
 

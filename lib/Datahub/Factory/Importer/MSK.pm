@@ -23,7 +23,7 @@ has pid_username       => (is => 'ro');
 has pid_password       => (is => 'ro');
 has pid_lwp_realm      => (is => 'ro');
 has pid_lwp_url        => (is => 'ro');
-has rcf_container_name => (is => 'ro');
+has pid_rcf_container_name => (is => 'ro');
 
 
 sub _build_importer {
@@ -55,11 +55,11 @@ sub prepare {
 sub __pids {
     my $self = shift;
     my $pid = Datahub::Factory->module('PID')->new(
-        pid_module         => $self->pid_module,
-        pid_username       => $self->pid_username,
-        pid_password       => $self->pid_password,
-        rcf_container_name => $self->rcf_container_name,
-        rcf_object         => 'PIDS_MSK_UTF8.csv'
+        pid_module             => $self->pid_module,
+        pid_username           => $self->pid_username,
+        pid_password           => $self->pid_password,
+        pid_rcf_container_name => $self->pid_rcf_container_name,
+        pid_rcf_object         => 'PIDS_MSK_UTF8.csv'
     );
     $pid->temporary_table($pid->path);
 }

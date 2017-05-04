@@ -10,3 +10,4 @@ MYMETA.*
 /Datahub-Factory-PIDS-*
 /Datahub-Factory-Arthub-*
 .DS_Store
+lib/Datahub/Factory/Importer/MSK_dep.pm
