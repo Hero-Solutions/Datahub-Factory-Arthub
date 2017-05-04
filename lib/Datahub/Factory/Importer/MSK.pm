@@ -18,7 +18,7 @@ has from               => (is => 'ro');
 has until              => (is => 'ro');
 has username           => (is => 'ro');
 has password           => (is => 'ro');
-has pid_module         => (is => 'ro', default => 'lwp');
+#has pid_module         => (is => 'ro', default => 'lwp');
 has pid_username       => (is => 'ro');
 has pid_password       => (is => 'ro');
 has pid_lwp_realm      => (is => 'ro');
@@ -55,7 +55,7 @@ sub prepare {
 sub __pids {
     my $self = shift;
     my $pid = Datahub::Factory->module('PID')->new(
-        pid_module             => $self->pid_module,
+        pid_module             => 'rcf',
         pid_username           => $self->pid_username,
         pid_password           => $self->pid_password,
         pid_rcf_container_name => $self->pid_rcf_container_name,
@@ -67,11 +67,11 @@ sub __pids {
 sub __creators {
     my $self = shift;
     my $pid = Datahub::Factory->module('PID')->new(
-        pid_module         => $self->pid_module,
-        pid_username       => $self->pid_username,
-        pid_password       => $self->pid_password,
-        rcf_container_name => $self->rcf_container_name,
-        rcf_object         => 'CREATORS_MSK_UTF8.csv'
+        pid_module             => 'rcf',
+        pid_username           => $self->pid_username,
+        pid_password           => $self->pid_password,
+        pid_rcf_container_name => $self->pid_rcf_container_name,
+        pid_rcf_object         => 'CREATORS_MSK_UTF8.csv'
     );
     $pid->temporary_table($pid->path);
 }
@@ -79,11 +79,11 @@ sub __creators {
 sub __aat {
     my $self = shift;
     my $pid = Datahub::Factory->module('PID')->new(
-        pid_module         => $self->pid_module,
-        pid_username       => $self->pid_username,
-        pid_password       => $self->pid_password,
-        rcf_container_name => $self->rcf_container_name,
-        rcf_object         => 'AAT_UTF8.csv'
+        pid_module             => 'rcf',
+        pid_username           => $self->pid_username,
+        pid_password           => $self->pid_password,
+        pid_rcf_container_name => $self->pid_rcf_container_name,
+        pid_rcf_object         => 'AAT_UTF8.csv'
     );
     $pid->temporary_table($pid->path, 'record - object_name');
 }
@@ -162,6 +162,18 @@ Optionally, a I<must_be_older_than> date.
 =item C<until>
 
 Optionally, a I<must_be_younger_than> date.
+
+=item C<pid_username>
+
+Provide your Rackspace Cloud Files username.
+
+=item C<pid_password>
+
+Provide your Rackspace Cloud Files api key.
+
+=item C<pid_rcf_container_name>
+
+Provide the container name that holds the PID CSV's.
 
 =back
 
