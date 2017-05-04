@@ -95,17 +95,20 @@ __END__
 
 =head1 NAME
 
-Datahub::Factory::Importer::OAI - Import data from an L<OAI-PMH|https://www.openarchives.org/pmh/> endpoint
+Datahub::Factory::Importer::MSK - Import data from the MSK L<OAI-PMH|https://www.openarchives.org/pmh/> endpoint
 
 =head1 SYNOPSIS
 
-    use Datahub::Factory::Importer::OAI;
+    use Datahub::Factory::Importer::MSK;
     use Data::Dumper qw(Dumper);
 
-    my $oai = Datahub::Factory::Importer::OAI->new(
-        url            => 'https://biblio.ugent.be/oai',
-        metadataPrefix => 'oai_dc',
-        set            => '2011'
+    my $oai = Datahub::Factory::Importer::MSK->new(
+        url                    => 'https://endpoint.msk.be/oai',
+        metadataPrefix         => 'oai_lido',
+        set                    => '2011',
+        pid_username           => 'datahub',
+        pid_password           => 'datahub',
+        pid_rcf_container_name => 'datahub',
     );
 
     $oai->importer->each(sub {
@@ -115,11 +118,15 @@ Datahub::Factory::Importer::OAI - Import data from an L<OAI-PMH|https://www.open
 
 =head1 DESCRIPTION
 
-Datahub::Factory::Importer::OAI imports data from an OAI-PMH endpoint. By default it uses the C<ListRecords>
+Datahub::Factory::Importer::MSK imports data from the MSK OAI-PMH endpoint. By default it uses the C<ListRecords>
 verb to return all records using the I<oai_lido> format. It is possible to only return records from a single
 I<Set> or those created, modified or deleted between two dates (I<from> and I<until>).
 
 It automatically deals with I<resumptionTokens>, so client code does not have to implement paging.
+
+To support PIDs, it uses Rackspace Cloud Files to fetch PID CSV's and convert them to temporary sqlite tables.
+
+Provide C<pid_username>, C<pid_password> and C<pid_rcf_container_name>.
 
 =head1 PARAMETERS
 
