@@ -2,6 +2,9 @@ Revision history for Datahub-Factory-VKC
 
 {{$NEXT}}
 
+0.04  2017-05-04 06:16:37 UTC
+	- Added re-usable PID module
+
 0.03  2017-04-20 08:05:34 UTC
 	- PIDS are now in TMS
 
