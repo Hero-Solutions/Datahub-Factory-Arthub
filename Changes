@@ -1,6 +1,8 @@
 Revision history for Datahub-Factory-VKC
 
 {{$NEXT}}
+	- Updated documentation
+	- Added extra PID options
 
 0.06  2017-05-04 07:48:16 UTC
 	- Updated documentation for MSK
