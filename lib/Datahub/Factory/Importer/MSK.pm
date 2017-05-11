@@ -155,6 +155,7 @@ for an example.
 URL of the OAI endpoint.
 
 =item handler( sub {} | $object | 'NAME' | '+NAME' )
+
 Handler to transform each record from XML DOM (L<XML::LibXML::Element>) into
 Perl hash.
 
@@ -193,6 +194,8 @@ Optionally, a I<must_be_younger_than> date.
 =back
 
 =head2 PID options
+
+=over
 
 =item C<pid_module>
 
