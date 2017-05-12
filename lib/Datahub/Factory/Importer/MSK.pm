@@ -29,15 +29,21 @@ has pid_rcf_container_name => (is => 'ro');
 
 sub _build_importer {
     my $self = shift;
-    my $importer = Catmandu::Importer::OAI->new(
+    my $options = {
         url            => $self->endpoint,
         handler        => $self->handler,
         metadataPrefix => $self->metadata_prefix,
         from           => $self->from,
         until          => $self->until,
         set            => $self->set,
-        username       => $self->username,
-        password       => $self->password,
+    };
+    if (defined($self->username)) {
+        $options->{'username'} = $self->username;
+        $options->{'password'} = $self->password;
+    }
+
+    my $importer = Catmandu::Importer::OAI->new(
+       $options
     );
     $self->prepare();
     return $importer;
