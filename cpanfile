@@ -11,3 +11,6 @@ requires 'Catmandu::Importer::DBI';
 requires 'DBD::mysql';
 requires 'DBD::SQLite';
 requires 'WebService::Rackspace::CloudFiles';
+requires 'URI::Split';
+requires 'LWP::UserAgent';
+requires 'Try::Tiny';

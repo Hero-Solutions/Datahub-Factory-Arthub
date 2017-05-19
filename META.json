@@ -38,6 +38,9 @@
       "runtime" : {
          "requires" : {
             "Datahub::Factory" : "0",
+            "LWP::UserAgent" : "0",
+            "Try::Tiny" : "0",
+            "URI::Split" : "0",
             "perl" : "5.008005"
          }
       },
@@ -59,7 +62,7 @@
          "web" : "https://github.com/thedatahub/Datahub-Factory-Arthub"
       }
    },
-   "version" : "0.03",
+   "version" : "0.8",
    "x_contributors" : [
       "Pieter De Praetere <pieter.de.praetere@helptux.be>",
       "Pieter De Praetere <pieter@packed.be>"

@@ -10,7 +10,7 @@ It contains the following packages:
 
 - [Datahub::Factory::Importer::KMSKA](https://metacpan.org/pod/Datahub::Factory::Importer::KMSKA)
 - [Datahub::Factory::Importer::MSK](https://metacpan.org/pod/Datahub::Factory::Importer::MSK)
-- [Datahub::Factory::Importer::PIDS](https://metacpan.org/pod/Datahub::Factory::Importer::PIDS)
+- [Datahub::Factory::Module::PID](https://metacpan.org/pod/Datahub::Factory::Module::PID)
 - [Datahub::Factory::Importer::VKC](https://metacpan.org/pod/Datahub::Factory::Importer::VKC)
 
 # AUTHOR

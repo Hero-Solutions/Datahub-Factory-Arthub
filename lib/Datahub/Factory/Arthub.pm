@@ -1,7 +1,7 @@
 package Datahub::Factory::Arthub;
 
 use strict;
-our $VERSION = '0.03';
+our $VERSION = '0.8';
 
 1;
 __END__
@@ -24,7 +24,7 @@ It contains the following packages:
 
 =item L<Datahub::Factory::Importer::MSK>
 
-=item L<Datahub::Factory::Importer::PIDS>
+=item L<Datahub::Factory::Module::PID>
 
 =item L<Datahub::Factory::Importer::VKC>
 
