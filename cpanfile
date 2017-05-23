@@ -14,3 +14,5 @@ requires 'WebService::Rackspace::CloudFiles';
 requires 'URI::Split';
 requires 'LWP::UserAgent';
 requires 'Try::Tiny';
+requires 'Authen::NTLM';
+requires 'LWP::Protocol::https';
