@@ -1,6 +1,8 @@
 Revision history for Datahub-Factory-VKC
 
 {{$NEXT}}
+	- renamed: MSK importer to EIZ (ErfgoedInzicht) importer
+	- changed: break if no CSV file was found
 	- added: missing dependencies
 	- updated: CHANGES file
 	- added: missing required modules
