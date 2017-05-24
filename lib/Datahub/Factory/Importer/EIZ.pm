@@ -66,7 +66,7 @@ sub __pids {
         pid_username           => $self->pid_username,
         pid_password           => $self->pid_password,
         pid_rcf_container_name => $self->pid_rcf_container_name,
-        pid_rcf_object         => 'PIDS_MSK_UTF8.csv',
+        pid_rcf_object         => '/tmp/PIDS_MSK_UTF8.csv',
         pid_lwp_url            => uri_join($self->pid_lwp_base_url, 'PIDS_MSK_UTF8.csv'),
         pid_lwp_realm          => $self->pid_lwp_realm,
     );
@@ -80,7 +80,7 @@ sub __creators {
         pid_username           => $self->pid_username,
         pid_password           => $self->pid_password,
         pid_rcf_container_name => $self->pid_rcf_container_name,
-        pid_rcf_object         => 'CREATORS_MSK_UTF8.csv',
+        pid_rcf_object         => '/tmp/CREATORS_MSK_UTF8.csv',
         pid_lwp_url            => uri_join($self->pid_lwp_base_url, 'CREATORS_MSK_UTF8.csv'),
         pid_lwp_realm          => $self->pid_lwp_realm,
     );
@@ -94,7 +94,7 @@ sub __aat {
         pid_username           => $self->pid_username,
         pid_password           => $self->pid_password,
         pid_rcf_container_name => $self->pid_rcf_container_name,
-        pid_rcf_object         => 'AAT_UTF8.csv',
+        pid_rcf_object         => '/tmp/AAT_UTF8.csv',
         pid_lwp_url            => uri_join($self->pid_lwp_base_url, 'AAT_UTF8.csv'),
         pid_lwp_realm          => $self->pid_lwp_realm,
     );
@@ -108,15 +108,16 @@ __END__
 
 =head1 NAME
 
-Datahub::Factory::Importer::MSK - Import data from the MSK L<OAI-PMH|https://www.openarchives.org/pmh/> endpoint
+Datahub::Factory::Importer::EIZ - Import data from the ErfgoedInzicht
+L<OAI-PMH|https://www.openarchives.org/pmh/> endpoint
 
 =head1 SYNOPSIS
 
-    use Datahub::Factory::Importer::MSK;
+    use Datahub::Factory::Importer::EIZ;
     use Data::Dumper qw(Dumper);
 
-    my $oai = Datahub::Factory::Importer::MSK->new(
-        url                    => 'https://endpoint.msk.be/oai',
+    my $oai = Datahub::Factory::Importer::EIZ->new(
+        url                    => 'https://endpoint.eiz.be/oai',
         metadataPrefix         => 'oai_lido',
         set                    => '2011',
         pid_module             => 'rcf',
@@ -132,26 +133,34 @@ Datahub::Factory::Importer::MSK - Import data from the MSK L<OAI-PMH|https://www
 
 =head1 DESCRIPTION
 
-Datahub::Factory::Importer::MSK imports data from the MSK OAI-PMH endpoint. By default it uses the C<ListRecords>
-verb to return all records using the I<oai_lido> format. It is possible to only return records from a single
-I<Set> or those created, modified or deleted between two dates (I<from> and I<until>).
+Datahub::Factory::Importer::EIZ imports data from the ErfgoedInzicht OAI-PMH
+endpoint. By default it uses the C<ListRecords> verb to return all records using
+the I<oai_lido> format. It is possible to only return records from a single
+I<Set> or those created, modified or deleted between two dates (I<from> and
+I<until>).
 
-It automatically deals with I<resumptionTokens>, so client code does not have to implement paging.
+It automatically deals with I<resumptionTokens>, so client code does not have to
+implement paging.
 
-To support PIDs, it uses Rackspace Cloud Files to fetch PID CSV's and convert them to temporary sqlite tables.
+To support PIDs, it uses Rackspace Cloud Files to fetch PID CSV's and convert
+them to temporary sqlite tables.
 
 Provide C<pid_username>, C<pid_password> and C<pid_rcf_container_name>.
 
 =head1 PARAMETERS
 
-The C<endpoint> parameter and some L<PID module parameters|Datahub::Factory::Module::PID> are required.
+The C<endpoint> parameter and some
+L<PID module parameters|Datahub::Factory::Module::PID> are required.
 
-To link PIDs (Persistent Identifiers) to MSK records, it is necessary to use the PID module to fetch a
-CSV from either a Rackspace Cloud Files (protected by username and password) instance or a public web
-site. Depending on whether you choose Rackspace or a Web site, different options must be set. If an
-option is not applicable for your selected module, you can skip the parameter or set it to C<undef>.
+To link PIDs (Persistent Identifiers) to MSK records, it is necessary to use the
+PID module to fetch a CSV from either a Rackspace Cloud Files (protected by
+username and password) instance or a public website. Depending on whether you
+choose Rackspace or a Web site, different options must be set. If an option is
+not applicable for your selected module, you can skip the parameter or set it
+to C<undef>.
 
-The CSV files are converted to sqlite tables inside C</tmp> and can be used in your fixes. See L<msk.fix|https://github.com/VlaamseKunstcollectie/Datahub-Fixes/blob/master/msk.fix>
+The CSV files are converted to sqlite tables inside C</tmp> and can be used in
+your fixes. See L<msk.fix|https://github.com/VlaamseKunstcollectie/Datahub-Fixes/blob/master/msk.fix>
 for an example.
 
 =over
@@ -246,10 +255,11 @@ A L<Importer|Catmandu::Importer> that can be used in your script.
 =head1 AUTHOR
 
 Pieter De Praetere E<lt>pieter at packed.be E<gt>
+Matthias Vandermaesen E<lt>matthias dot vandermaesen at vlaamsekunstcollectie.be E<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2017- PACKED vzw
+Copyright 2017- PACKED vzw, Vlaamse Kunstcollectie vzw
 
 =head1 LICENSE
 
