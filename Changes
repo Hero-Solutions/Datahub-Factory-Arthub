@@ -1,6 +1,7 @@
 Revision history for Datahub-Factory-VKC
 
 {{$NEXT}}
+	- changed: disabled Rackspace and Webfile support. Only local file supported. PIDs should be part of the registration system.
 	- renamed: MSK importer to EIZ (ErfgoedInzicht) importer
 	- changed: break if no CSV file was found
 	- added: missing dependencies
