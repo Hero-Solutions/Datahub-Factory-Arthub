@@ -1,6 +1,7 @@
 Revision history for Datahub-Factory-VKC
 
 {{$NEXT}}
+    - changed: conform to new Catmandu::Store::Datahub API
     - added: Arthub Exporter module
     - changed: disabled Rackspace and Webfile support. Only local file supported. PIDs should be part of the registration system.
     - renamed: MSK importer to EIZ (ErfgoedInzicht) importer

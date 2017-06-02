@@ -5,6 +5,7 @@ use warnings;
 
 use Datahub::Factory::Sane;
 
+use Lido::XML;
 use Moo;
 use Catmandu;
 use namespace::clean;
@@ -17,6 +18,7 @@ has oauth_client_id     => (is => 'ro', required => 1);
 has oauth_client_secret => (is => 'ro', required => 1);
 has oauth_username      => (is => 'ro', required => 1);
 has oauth_password      => (is => 'ro', required => 1);
+has lido         => (is => 'lazy');
 
 sub _build_out {
     my $self = shift;
@@ -33,15 +35,22 @@ sub _build_out {
 
 sub add {
     my ($self, $item) = @_;
-    $self->out->add($item);
+
+    my $data = {
+        'id' => $item->{'lidoRecID'}->[0]->{'_'},
+        '_'  => $self->lido->to_xml($item)
+    };
+
+    $self->out->bag->add($data);
 }
 
-sub update {
-    my ($self, $id, $item) = @_;
-    $self->out->update($id, $item);
+sub _build_lido {
+    my $self = shift;
+    return Lido::XML->new();
 }
 
 1;
+
 __END__
 
 =encoding utf-8
@@ -105,7 +114,6 @@ Datahub password. Required.
 =head1 AUTHORS
 
 Pieter De Praetere <pieter@packed.be>
-
 Matthias Vandermaesen <matthias.vandermaesen@vlaamsekunstcollectie.be>
 
 =head1 COPYRIGHT
