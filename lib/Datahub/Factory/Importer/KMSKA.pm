@@ -8,7 +8,7 @@ use Catmandu;
 
 use Config::Simple;
 
-use Datahub::Factory::Importer::TMS::Index;
+use Datahub::Factory::Importer::KMSKA::TMS::Index;
 
 with 'Datahub::Factory::Importer';
 
@@ -23,7 +23,7 @@ sub _build_importer {
     my $dsn = sprintf('dbi:mysql:%s', $self->db_name);
     # Add indices
     $self->logger->info('Creating indices on TMS tables.');
-    Datahub::Factory::Importer::TMS::Index->new(
+    Datahub::Factory::Importer::KMSKA::TMS::Index->new(
         db_host => $self->db_host,
         db_name => $self->db_name,
         db_user => $self->db_user,
