@@ -1,6 +1,8 @@
 Revision history for Datahub-Factory-VKC
 
 {{$NEXT}}
+
+0.9  2017-06-08 11:27:39 CEST
     - changed: conform to new Catmandu::Store::Datahub API
     - added: Arthub Exporter module
     - changed: disabled Rackspace and Webfile support. Only local file supported. PIDs should be part of the registration system.
