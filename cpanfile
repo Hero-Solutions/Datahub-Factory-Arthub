@@ -20,3 +20,4 @@ requires 'Catmandu::AAT';
 requires 'Catmandu::VIAF';
 requires 'Catmandu::Store::DBI';
 requires 'DBD::SQLite';
+requires 'DBD::mysql';
