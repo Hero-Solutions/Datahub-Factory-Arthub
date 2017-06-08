@@ -16,8 +16,7 @@ has db_host     => (is => 'ro', required => 1);
 has db_name     => (is => 'ro', required => 1);
 has db_user     => (is => 'ro', required => 1);
 has db_password => (is => 'ro', required => 1);
-
-has tms      => (is => 'lazy');
+has generate_temp_tables => (is => 'ro', default => 1);
 
 sub _build_importer {
     my $self = shift;
@@ -32,7 +31,11 @@ sub _build_importer {
     );
     my $query = 'select * from vgsrpObjTombstoneD_RO;';
     my $importer = Catmandu->importer('DBI', dsn => $dsn, host => $self->db_host, user => $self->db_user, password => $self->db_password, query => $query, encoding => ':iso-8859-1');
-    $self->prepare();
+
+    if ($self->generate_temp_tables) {
+        $self->prepare();
+    }
+
     return $importer
 }
 
@@ -139,7 +142,7 @@ sub __dimensions {
         DimensionElements e ON e.ElementID = x.ElementID
     WHERE
         x.TableID = '108'
-    AND 
+    AND
         x.ElementID = '3';";
     $self->merge_call($query, 'dimensions', 'dimensions');
 }
