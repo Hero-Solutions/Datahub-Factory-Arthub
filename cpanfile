@@ -8,6 +8,7 @@ on test => sub {
 
 requires 'Datahub::Factory';
 requires 'Catmandu::Importer::DBI';
+requires 'Catmandu::Adlib';
 requires 'DBD::mysql';
 requires 'DBD::SQLite';
 requires 'WebService::Rackspace::CloudFiles';

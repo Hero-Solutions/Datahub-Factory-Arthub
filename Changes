@@ -1,6 +1,7 @@
 Revision history for Datahub-Factory-VKC
 
 {{$NEXT}}
+    - fixed: missing Catmandu::Adlib dependency
     - changed: moved TMS::Index to a dedicated KMSKA namespace
     - added: missing dependency DBD::mysql
 
