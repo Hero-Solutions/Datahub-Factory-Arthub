@@ -1,14 +1,14 @@
 package Datahub::Factory::Importer::KMSKA;
 
-use strict;
-use warnings;
+use Datahub::Factory::Sane;
+
+our $VERSION = '0.91';
 
 use Moo;
 use Catmandu;
-
 use Config::Simple;
-
 use Datahub::Factory::Importer::KMSKA::TMS::Index;
+use namespace::clean;
 
 with 'Datahub::Factory::Importer';
 

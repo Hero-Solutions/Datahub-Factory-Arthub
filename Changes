@@ -2,6 +2,7 @@ Revision history for Datahub-Factory-VKC
 
 {{$NEXT}}
 
+    - Changed: improved import headers and our $VERSION.
     - Changed: minimal required version of Datahub::Factory is 1.70.
     - Added: a dist.ini for dist / dzil milla
     - fixed: missing Catmandu::Adlib dependency

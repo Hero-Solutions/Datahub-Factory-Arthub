@@ -1,10 +1,13 @@
 package Datahub::Factory::Importer::KMSKA::TMS::Index;
 
+use Datahub::Factory::Sane;
+
+our $VERSION = '0.91';
+
 use Moo;
 use Catmandu;
-use strict;
-
 use DBI;
+use namespace::clean;
 
 has db_host     => (is => 'ro', required => 1);
 has db_name     => (is => 'ro', required => 1);

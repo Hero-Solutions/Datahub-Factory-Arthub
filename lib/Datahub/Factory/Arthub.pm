@@ -1,7 +1,9 @@
 package Datahub::Factory::Arthub;
 
-use strict;
-our $VERSION = '0.9';
+use Datahub::Factory::Sane;
+use namespace::clean;
+
+our $VERSION = '0.91';
 
 1;
 __END__
