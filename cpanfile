@@ -6,7 +6,7 @@ on test => sub {
 	    requires 'Test::More', '0.96';
 };
 
-requires 'Datahub::Factory';
+requires 'Datahub::Factory', '1.70';
 requires 'Catmandu::Importer::DBI';
 requires 'Catmandu::Adlib';
 requires 'DBD::mysql';
