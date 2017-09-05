@@ -1,6 +1,8 @@
 Revision history for Datahub-Factory-VKC
 
 {{$NEXT}}
+
+    - Added: a dist.ini for dist / dzil milla
     - fixed: missing Catmandu::Adlib dependency
     - changed: moved TMS::Index to a dedicated KMSKA namespace
     - added: missing dependency DBD::mysql
