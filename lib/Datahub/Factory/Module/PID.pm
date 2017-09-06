@@ -2,7 +2,7 @@ package Datahub::Factory::Module::PID;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '0.91';
+our $VERSION = '0.92';
 
 use Datahub::Factory::Module::PID::CloudFiles;
 use Datahub::Factory::Module::PID::WebFile;
