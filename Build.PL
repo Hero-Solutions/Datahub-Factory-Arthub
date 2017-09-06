@@ -15,11 +15,11 @@ my %module_build_args = (
   },
   "dist_abstract" => "modules for the L<VKC Arthub|>",
   "dist_author" => [
-    "Pieter De Praetere <pieter at packed.be >"
+    "Matthias Vandermaesen <matthias.vandermaesen\@vlaamsekunstcollectie.be>"
   ],
   "dist_name" => "Datahub-Factory-Arthub",
   "dist_version" => "0.91",
-  "license" => "perl",
+  "license" => "gpl",
   "module_name" => "Datahub::Factory::Arthub",
   "recursive_test_files" => 1,
   "requires" => {

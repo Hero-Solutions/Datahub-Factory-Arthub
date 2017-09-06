@@ -2,6 +2,8 @@ Revision history for Datahub-Factory-VKC
 
 {{$NEXT}}
 
+    - Changed: updated documentation and licensing
+
 0.91  2017-09-05 14:18:12 CEST
 
     - Changed: improved import headers and our $VERSION.
