@@ -8,15 +8,18 @@ use Moo;
 use Catmandu;
 use Config::Simple;
 use Datahub::Factory::Importer::KMSKA::TMS::Index;
+use File::Basename qw(fileparse);
 use namespace::clean;
 
 with 'Datahub::Factory::Importer';
 
-has db_host     => (is => 'ro', required => 1);
-has db_name     => (is => 'ro', required => 1);
-has db_user     => (is => 'ro', required => 1);
-has db_password => (is => 'ro', required => 1);
-has generate_temp_tables => (is => 'ro', default => 1);
+has db_host                => (is => 'ro', required => 1);
+has db_name                => (is => 'ro', required => 1);
+has db_user                => (is => 'ro', required => 1);
+has db_password            => (is => 'ro', required => 1);
+has generate_temp_tables   => (is => 'ro', default => 1);
+has aat_path               => (is => 'ro', required => 1);
+has creators_path          => (is => 'ro', required => 1);
 
 sub _build_importer {
     my $self = shift;
@@ -42,6 +45,10 @@ sub _build_importer {
 sub prepare {
     my $self = shift;
     # Create temporary tables
+    $self->logger->info('Creating "creators" temporary table.');
+    $self->__creators();
+    $self->logger->info('Creating "aat" temporary table.');
+    $self->__aat();
     $self->logger->info('Adding "classifications" temporary table.');
     $self->__classifications();
     $self->logger->info('Adding "periods" temporary table.');
@@ -157,7 +164,47 @@ sub __subjects {
     y.ThesXrefTypeID = 30;"; # Only those from the VKC website
     $self->merge_call($query, 'subjects', 'subjects');
 }
+
+sub __creators {
+    my $self = shift;
+    $self->temporary_table($self->creators_path);
+}
+
+sub __aat {
+    my $self = shift;
+    $self->temporary_table($self->aat_path);
+}
+
+sub temporary_table {
+    my ($self, $csv_location, $id_column) = @_;
+    my $store_table = fileparse($csv_location, '.csv');
+
+    unless (-e $csv_location) {
+        Catmandu::BadArg->throw(
+            message => sprintf('The CSV file %s is missing.', $store_table)
+        );
+    }
+
+    my $importer = Catmandu->importer(
+        'CSV',
+        file => $csv_location
+    );
+    my $store = Catmandu->store(
+        'DBI',
+        data_source => sprintf('dbi:SQLite:/tmp/import.%s.sqlite', $store_table),
+    );
+    $importer->each(sub {
+            my $item = shift;
+            if (defined ($id_column)) {
+                $item->{'_id'} = $item->{$id_column};
+            }
+            my $bag = $store->bag();
+            $bag->add($item);
+        });
+}
+
 1;
+
 __END__
 
 =encoding utf-8
@@ -175,7 +222,9 @@ Datahub::Factory::Importer::KMSKA - Import data from the L<TMS|http://www.galler
         db_host     => 'localhost',
         db_name     => 'kmska',
         db_user     => 'kmska',
-        db_password => 'kmska'
+        db_password => 'kmska',
+        aat_path    => '/path/to/aat.csv',
+        creators_path => '/path/to/creators.csv'
     );
 
     $kmska->importer->each(sub {
@@ -211,6 +260,14 @@ Username to connect to the database.
 =item C<db_password>
 
 Password for the user.
+
+=item C<aat_path>
+
+Path to a CSV file containing AAT terms vocabulary.
+
+=item C<creators_path>
+
+Path to a CSV file containing Creator terms vocabulary.
 
 =back
 
