@@ -71,7 +71,6 @@ sub prepare_call {
    $importer->each(sub {
             my $item = shift;
             my $bag = $store->bag();
-            # first $bag->get($item->{'_id'})
             $bag->add($item);
         });
 }
