@@ -17,6 +17,7 @@ has db_host                => (is => 'ro', required => 1);
 has db_name                => (is => 'ro', required => 1);
 has db_user                => (is => 'ro', required => 1);
 has db_password            => (is => 'ro', required => 1);
+has generate_vocabularies  => (is => 'ro', default => 1);
 has generate_temp_tables   => (is => 'ro', default => 1);
 has aat_path               => (is => 'ro', required => 1);
 has creators_path          => (is => 'ro', required => 1);
@@ -35,20 +36,26 @@ sub _build_importer {
     my $query = 'select * from vgsrpObjTombstoneD_RO;';
     my $importer = Catmandu->importer('DBI', dsn => $dsn, host => $self->db_host, user => $self->db_user, password => $self->db_password, query => $query, encoding => ':iso-8859-1');
 
-    if ($self->generate_temp_tables) {
-        $self->prepare();
-    }
+    $self->prepare();
 
     return $importer
 }
 
 sub prepare {
     my $self = shift;
-    # Create temporary tables
-    $self->logger->info('Creating "creators" temporary table.');
-    $self->__creators();
-    $self->logger->info('Creating "aat" temporary table.');
-    $self->__aat();
+
+    if ($self->generate_temp_tables) {
+        $self->__generate_temp_tables();
+    }
+
+    if ($self->generate_vocabularies) {
+        $self->__generate_vocabularies();
+    }
+}
+
+sub __generate_temp_tables {
+    my $self = shift;
+
     $self->logger->info('Adding "classifications" temporary table.');
     $self->__classifications();
     $self->logger->info('Adding "periods" temporary table.');
@@ -61,8 +68,18 @@ sub prepare {
     $self->__pids();
 }
 
+sub __generate_vocabularies {
+    my $self = shift;
+
+    $self->logger->info('Creating "creators" temporary table.');
+    $self->__creators();
+    $self->logger->info('Creating "aat" temporary table.');
+    $self->__aat();
+}
+
 sub prepare_call {
     my ($self, $import_query, $store_table) = @_;
+
     my $importer = Catmandu->importer(
         'DBI',
         dsn      => sprintf('dbi:mysql:%s', $self->db_name),
@@ -71,11 +88,13 @@ sub prepare_call {
         password => $self->db_password,
         query    => $import_query
     );
+
     my $store = Catmandu->store(
         'DBI',
         data_source => sprintf('dbi:SQLite:/tmp/tms_import.%s.sqlite', $store_table),
     );
-   $importer->each(sub {
+
+    $importer->each(sub {
             my $item = shift;
             my $bag = $store->bag();
             $bag->add($item);
@@ -84,6 +103,7 @@ sub prepare_call {
 
 sub merge_call {
     my ($self, $query, $key, $out_name) = @_;
+
     my $importer = Catmandu->importer(
         'DBI',
         dsn      => sprintf('dbi:mysql:%s', $self->db_name),
@@ -92,7 +112,9 @@ sub merge_call {
         password => $self->db_password,
         query    => $query
     );
+    
     my $merged = {};
+
     $importer->each(sub {
         my $item = shift;
         my $objectid = $item->{'objectid'};
@@ -104,10 +126,12 @@ sub merge_call {
             };
         }
     });
+
     my $store = Catmandu->store(
         'DBI',
         data_source => sprintf('dbi:SQLite:/tmp/tms_import.%s.sqlite', $out_name),
     );
+
     while (my ($object_id, $data) = each %{$merged}) {
         $store->bag->add({
             '_id' => $object_id,
@@ -118,22 +142,26 @@ sub merge_call {
 
 sub __classifications {
     my $self = shift;
+
     $self->prepare_call('select ClassificationID as _id, Classification as term from Classifications', 'classifications');
 }
 
 sub __period {
     my $self = shift;
+
     $self->prepare_call('select ObjectID as _id, Period as term from ObjContext', 'periods');
 }
 
 sub __pids {
     my $self = shift;
+
     # key is object_number
     $self->prepare_call('select ObjectNumber as _id, workPidURI as workPid, dataPidURI as dataPid from Cit_KMSKApids_conversie_gecorrigeerd', 'Cit_KMSKApids_conversie_gecorrigeerd');
 }
 
 sub __dimensions {
     my $self = shift;
+
     my $query = "SELECT o.ObjectID as objectid, d.Dimension as dimension, t.DimensionType as type, e.Element as element, u.UnitName as unit
     FROM vgsrpObjTombstoneD_RO o
     LEFT JOIN
@@ -155,6 +183,7 @@ sub __dimensions {
 
 sub __subjects {
     my $self = shift;
+
     my $query = "SELECT o.ObjectID as objectid, t.Term as subject
     FROM Terms t, vgsrpObjTombstoneD_RO o, ThesXrefs x, ThesXrefTypes y
     WHERE
@@ -167,11 +196,13 @@ sub __subjects {
 
 sub __creators {
     my $self = shift;
+
     $self->temporary_table($self->creators_path);
 }
 
 sub __aat {
     my $self = shift;
+
     $self->temporary_table($self->aat_path);
 }
 
@@ -189,10 +220,12 @@ sub temporary_table {
         'CSV',
         file => $csv_location
     );
+
     my $store = Catmandu->store(
         'DBI',
         data_source => sprintf('dbi:SQLite:/tmp/import.%s.sqlite', $store_table),
     );
+
     $importer->each(sub {
             my $item = shift;
             if (defined ($id_column)) {
@@ -268,6 +301,14 @@ Path to a CSV file containing AAT terms vocabulary.
 =item C<creators_path>
 
 Path to a CSV file containing Creator terms vocabulary.
+
+=item C<generate_vocabularies>
+
+Generate temporary SQLite db containing vocabularies from CSV file (1 or 0, defaults to 1)
+
+=item C<generate_temp_tables>
+
+Generate temporary SQLite db containing normalised data (1 or 0, defaults to 1)
 
 =back
 

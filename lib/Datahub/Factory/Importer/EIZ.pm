@@ -25,6 +25,7 @@ has password               => (is => 'ro');
 has pids_path              => (is => 'ro', required => 1);
 has aat_path               => (is => 'ro', required => 1);
 has creators_path          => (is => 'ro', required => 1);
+has generate_vocabularies  => (is => 'ro', default => 1);
 
 sub _build_importer {
     my $self = shift;
@@ -50,8 +51,15 @@ sub _build_importer {
 
 sub prepare {
     my $self = shift;
-    $self->logger->info('Creating "pids" temporary table.');
-    $self->__pids();
+
+    if ($self->generate_vocabularies) {
+        $self->__generate_vocabularies();
+    }
+}
+
+sub __generate_vocabularies {
+    my $self = shift;
+
     $self->logger->info('Creating "creators" temporary table.');
     $self->__creators();
     $self->logger->info('Creating "aat" temporary table.');
@@ -204,7 +212,27 @@ Optionally, a I<must_be_younger_than> date.
 
 =item C<username>
 
+Optional HTAccess username.
+
 =item C<password>
+
+Optional HTAccess password.
+
+=item C<pids_path>
+
+Path to a CSV file containing PIDS list.
+
+=item C<aat_path>
+
+Path to a CSV file containing AAT terms vocabulary.
+
+=item C<creators_path>
+
+Path to a CSV file containing Creator terms vocabulary.
+
+=item C<generate_vocabularies>
+
+Generate temporary SQLite db containing vocabularies from CSV file (1 or 0, defaults to 1)
 
 =back
 
