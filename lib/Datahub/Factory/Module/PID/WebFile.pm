@@ -2,7 +2,7 @@ package Datahub::Factory::Module::PID::WebFile;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '0.92';
+our $VERSION = '0.94';
 
 use Moo;
 use Catmandu;
