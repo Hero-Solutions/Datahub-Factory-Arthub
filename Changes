@@ -2,6 +2,8 @@ Revision history for Datahub-Factory-VKC
 
 {{$NEXT}}
 
+    - Changed: removed creating temporary SQLite databases from EIZ module.
+
 0.94  2017-11-13 11:28:19 CET
 
     - Changed: reverted back to 0.92 changes because bugs.
