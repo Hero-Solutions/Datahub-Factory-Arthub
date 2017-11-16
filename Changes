@@ -2,6 +2,7 @@ Revision history for Datahub-Factory-VKC
 
 {{$NEXT}}
 
+    - Changed: removed stale PID module code.
     - Changed: removed creating temporary SQLite databases from EIZ module.
 
 0.94  2017-11-13 11:28:19 CET
