@@ -65,10 +65,6 @@ L<OAI-PMH|https://www.openarchives.org/pmh/> endpoint
         url                    => 'https://endpoint.eiz.be/oai',
         metadataPrefix         => 'oai_lido',
         set                    => '2011',
-        pid_module             => 'rcf',
-        pid_username           => 'datahub',
-        pid_password           => 'datahub',
-        pid_rcf_container_name => 'datahub',
     );
 
     $oai->importer->each(sub {
@@ -86,11 +82,6 @@ I<until>).
 
 It automatically deals with I<resumptionTokens>, so client code does not have to
 implement paging.
-
-To support PIDs, it uses Rackspace Cloud Files to fetch PID CSV's and convert
-them to temporary sqlite tables.
-
-Provide C<pid_username>, C<pid_password> and C<pid_rcf_container_name>.
 
 =head1 PARAMETERS
 
@@ -150,40 +141,6 @@ Optionally, a I<must_be_younger_than> date.
 =item C<username>
 
 =item C<password>
-
-=back
-
-=head2 PID options
-
-=over
-
-=item C<pid_module>
-
-Choose the PID module you want to use. Set to I<rcf> to use Rackspace Cloud Files, or to
-I<lwp> to use a public web site.
-
-=item C<pid_username>
-
-Provide your Rackspace Cloud Files username. If you selected I<lwp>, provide an optional
-username (for HTTP Basic Authentication).
-
-=item C<pid_password>
-
-Provide your Rackspace Cloud Files api key. For I<lwp>, an optional password.
-
-=item C<pid_rcf_container_name>
-
-Provide the container name that holds the PID CSV's for I<rcf>.
-
-=item C<pid_lwp_realm>
-
-For I<lwp>, provide (optionally) the HTTP Basic Authentication Realm.
-
-=item C<pid_lwp_base_url>
-
-For I<lwp>, provide the URL where the CSV's are stored. This URL is used in addition
-to the name of the CSV file to create the URL where the file can be fetched from (i.e
-C<my $url = $pid_lwp_base_url + $csv_file_name>).
 
 =back
 
