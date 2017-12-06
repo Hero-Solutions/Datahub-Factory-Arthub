@@ -2,6 +2,8 @@ Revision history for Datahub-Factory-VKC
 
 {{$NEXT}}
 
+    - Fixed: Added missing prereqs as reported by CPANTS
+
 0.95  2017-12-05 10:01:27 CET
 
     - Changed: removed stale PID module code.
