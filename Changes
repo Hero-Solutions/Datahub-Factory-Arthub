@@ -2,6 +2,8 @@ Revision history for Datahub-Factory-VKC
 
 {{$NEXT}}
 
+    - Fixed: Fixes #2 Multiple LidoRecID's.
+
 0.96  2017-12-06 13:51:39 CET
 
     - Fixed: Added missing prereqs as reported by CPANTS
