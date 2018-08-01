@@ -40,6 +40,18 @@ An exporter for the Arthub Flanders platform absed on LIDO and OAI.
 
 =back
 
+-head1 KMSKA
+
+The KMSKA module is based on the TMS installation operated by 
+the Royal Museum of Fine Arts Antwerp. Before using the module in 
+a Datahub::Factory pipeline, you need to execute a SQL file against 
+the MySQL (MariaDB) database  which contains a replication of 
+the TMS MS SQL database.
+
+Run this command:
+
+$ mysql -u <username> -p <databasename> < Resources/TMS/schema.sql
+
 =head1 AUTHORS
 
 Matthias Vandermaesen <matthias.vandermaesen@vlaamsekunstcollectie.be>
