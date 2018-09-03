@@ -2,7 +2,7 @@ package Datahub::Factory::Importer::EIZ;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '0.99';
+our $VERSION = '0.100';
 
 use Catmandu::Importer::OAI;
 use Moo;
