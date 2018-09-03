@@ -2,6 +2,8 @@ Revision history for Datahub-Factory-VKC
 
 {{$NEXT}}
 
+    - Changed: Skip record if no LidoRecID is available.
+
 0.99  2018-08-01 16:24:13 CEST
 
     - Changed: Yanked out SQL code and put in separate SQL file.
