@@ -153,7 +153,7 @@ sub __subjects {
 
 sub __objtitles {
     my $self = shift;
-    $self->merge_call('SELECT * FROM vobjtitles', 'objtitles', 'objtitles');
+    $self->prepare_call('SELECT * FROM vobjtitles', 'objtitles', 'objtitles');
 }
 
 1;
