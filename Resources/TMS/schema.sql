@@ -28,6 +28,28 @@ ALTER TABLE `Classifications` CHANGE `ClassificationID` `ClassificationID` VARCH
 ALTER TABLE `Classifications` CHANGE `Classification` `Classification` VARCHAR( 255 ) NULL DEFAULT NULL ;
 ALTER TABLE `Classifications` ADD INDEX ( `ClassificationID` , `Classification` );
 
+-- ClassificationXRefs
+
+ALTER TABLE `ClassificationXRefs` CHANGE `ID` `ID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `ClassificationXRefs` CHANGE `ClassificationID` `ClassificationID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `ClassificationXRefs` ADD INDEX ( `ClassificationID`, `ID`);
+
+-- ConXrefDetails
+
+ALTER TABLE `ConXrefDetails` CHANGE `ConXrefDetailID` `ConXrefDetailID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `ConXrefDetails` CHANGE `ConXrefID` `ConXrefID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `ConXrefDetails` CHANGE `RoleTypeID` `RoleTypeID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `ConXrefDetails` CHANGE `ConstituentID` `ConstituentID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `ConXrefDetails` ADD INDEX ( `ConXrefDetailID`, `ConXrefID`, `RoleTypeID`, `ConstituentID` );
+
+-- ConXrefs
+
+ALTER TABLE `ConXrefs` CHANGE `ConXrefID` `ConXrefID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `ConXrefs` CHANGE `RoleID` `RoleID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `ConXrefs` CHANGE `RoleTypeID` `RoleTypeID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `ConXrefs` CHANGE `TableID` `TableID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `ConXrefs` ADD INDEX ( `ConXrefID`, `RoleID`, `RoleTypeID`, `TableID` );
+
 -- ObjContext (ObjectID)
 
 ALTER TABLE `ObjContext` CHANGE `Period` `Period` VARCHAR( 255 ) NULL DEFAULT NULL;
@@ -99,21 +121,18 @@ ALTER TABLE `UserFieldXrefs` ADD INDEX ( `UserFieldID`, `ID`, `ContextID`, `Logi
 -- VIEW Constituents 
 
 CREATE OR REPLACE VIEW vconstituents AS
-SELECT ConstituentID AS _id,
-    AlphaSort,
-    DisplayName,
-    BeginDate,
-    EndDate,
-    BeginDateISO,
-    EndDateISO
-FROM Constituents;
+SELECT o.ObjectID as _id, o.ObjectNumber, c.AlphaSort, c.DisplayName, c.BeginDate, c.EndDate, c.BeginDateISO, c.EndDateISO, r.Role FROM Objects o
+   INNER JOIN ConXrefs cr ON cr.ID = o.ObjectID AND cr.TableID = 108 AND cr.RoleTypeID = 1
+   INNER JOIN (SELECT DISTINCT ConXrefID, ConstituentID FROM ConXrefDetails) cd ON cd.ConXRefID = cr.ConXrefID
+   LEFT JOIN Roles r ON r.RoleID = cr.RoleID
+   INNER JOIN Constituents c ON c.ConstituentID = cd.ConstituentID
 
 -- VIEW Classifications
 
 CREATE OR REPLACE VIEW vclassifications AS
-SELECT ClassificationID as _id,
-    Classification as term 
-FROM Classifications;
+SELECT o.ObjectID as _id, o.ObjectNumber, c.ClassificationID, c.Classification FROM Objects o
+  INNER JOIN ClassificationXRefs cr ON o.ObjectID = cr.ID
+  INNER JOIN Classifications c ON c.ClassificationID = cr.ClassificationID
 
 -- VIEW Periods
 
