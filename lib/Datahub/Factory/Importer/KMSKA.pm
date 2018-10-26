@@ -41,8 +41,12 @@ sub prepare {
     $self->__period();
     $self->logger->info('Adding "dimensions" temporary table.');
     $self->__dimensions();
+    $self->logger->info('Adding "objects" temporary table.');
+    $self->__objects();
     $self->logger->info('Adding "subjects" temporary table.');
     $self->__subjects();
+    $self->logger->info('Adding "materials" temporary table.');
+    $self->__materials();
     $self->logger->info('Adding "constituents" temporary table.');
     $self->__constituents();
     $self->logger->info('Adding "datapids" temporary table.');
@@ -53,6 +57,8 @@ sub prepare {
     $self->__workpids();
     $self->logger->info('Adding "objecttitles" temporary table.');
     $self->__objtitles();
+    $self->logger->info('Adding "descriptions" temporary table.');
+    $self->__descriptions();
 }
 
 sub prepare_call {
@@ -90,7 +96,7 @@ sub merge_call {
     my $merged = {};
     $importer->each(sub {
         my $item = shift;
-        my $objectid = $item->{'objectid'};
+        my $objectid = $item->{'_id'};
         if (exists($merged->{$objectid})) {
             push @{$merged->{$objectid}->{$key}}, $item;
         } else {
@@ -113,12 +119,12 @@ sub merge_call {
 
 sub __constituents {
     my $self = shift;
-    $self->prepare_call('SELECT * FROM vconstituents', 'constituents');
+    $self->merge_call('SELECT * FROM vconstituents', 'constituents', 'constituents');
 }
 
 sub __classifications {
     my $self = shift;
-    $self->prepare_call('SELECT * FROM vclassifications', 'classifications');
+    $self->merge_call('SELECT * FROM vclassifications', 'classifications', 'classifications');
 }
 
 sub __period {
@@ -146,14 +152,29 @@ sub __dimensions {
     $self->merge_call('SELECT * FROM vdimensions', 'dimensions', 'dimensions');
 }
 
+sub __objects {
+    my $self = shift;
+    $self->merge_call('SELECT * FROM vobjects', 'objects', 'objects');
+}
+
 sub __subjects {
     my $self = shift;
     $self->merge_call('SELECT * FROM vsubjects', 'subjects', 'subjects');
 }
 
+sub __materials {
+    my $self = shift;
+    $self->merge_call('SELECT * FROM vmaterials', 'materials', 'materials');
+}
+
 sub __objtitles {
     my $self = shift;
-    $self->prepare_call('SELECT * FROM vobjtitles', 'objtitles', 'objtitles');
+    $self->prepare_call('SELECT * FROM vobjtitles', 'objtitles');
+}
+
+sub __descriptions {
+    my $self = shift;
+    $self->prepare_call('SELECT * FROM vdescriptions', 'descriptions');
 }
 
 1;
