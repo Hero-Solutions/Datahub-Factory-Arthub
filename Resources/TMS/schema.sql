@@ -121,7 +121,7 @@ ALTER TABLE `UserFieldXrefs` ADD INDEX ( `UserFieldID`, `ID`, `ContextID`, `Logi
 -- VIEW Constituents 
 
 CREATE OR REPLACE VIEW vconstituents AS
-SELECT o.ObjectID as _id, o.ObjectNumber, c.AlphaSort, c.DisplayName, c.BeginDate, c.EndDate, c.BeginDateISO, c.EndDateISO, r.Role FROM Objects o
+SELECT o.ObjectID as _id, o.ObjectNumber, c.ConstituentID, c.AlphaSort, c.DisplayName, c.BeginDate, c.EndDate, c.BeginDateISO, c.EndDateISO, r.Role FROM Objects o
    INNER JOIN ConXrefs cr ON cr.ID = o.ObjectID AND cr.TableID = 108 AND cr.RoleTypeID = 1
    INNER JOIN (SELECT DISTINCT ConXrefID, ConstituentID FROM ConXrefDetails) cd ON cd.ConXRefID = cr.ConXrefID
    LEFT JOIN Roles r ON r.RoleID = cr.RoleID
@@ -144,11 +144,12 @@ FROM ObjContext;
 -- VIEW Dimensions
 
 CREATE OR REPLACE VIEW vdimensions AS
-SELECT o.ObjectID as objectid, 
+SELECT o.ObjectID as _id, 
     d.Dimension as dimension,
     t.DimensionType as type,
     e.Element as element,
-    u.UnitName as unit
+    u.UnitName as unit,
+    x.DisplayDimensions as display
 FROM CITvgsrpObjTombstoneD_RO o
 LEFT JOIN
     DimItemElemXrefs x ON x.ID = o.ObjectID
@@ -161,15 +162,30 @@ INNER JOIN
 INNER JOIN
     DimensionElements e ON e.ElementID = x.ElementID
 WHERE
-    x.TableID = '108'
-AND
-    x.ElementID = '3';
+    x.TableID = '108';
+
+-- VIEW Objects
+
+CREATE OR REPLACE VIEW vobjects AS
+SELECT o.ObjectID as _id,
+    t.Term as object,
+    t.TermID
+FROM Terms t, 
+    CITvgsrpObjTombstoneD_RO o,
+    ThesXrefs x,
+    ThesXrefTypes y
+WHERE
+    x.TermID = t.TermID AND
+    x.ID = o.ObjectID AND
+    x.ThesXrefTypeID = y.ThesXrefTypeID AND
+    y.ThesXrefTypeID = 3;
 
 -- VIEW Subjects
 
 CREATE OR REPLACE VIEW vsubjects AS
-SELECT o.ObjectID as objectid,
-    t.Term as subject
+SELECT o.ObjectID as _id,
+    t.Term as subject,
+    t.TermID
 FROM Terms t, 
     CITvgsrpObjTombstoneD_RO o,
     ThesXrefs x,
@@ -179,6 +195,22 @@ WHERE
     x.ID = o.ObjectID AND
     x.ThesXrefTypeID = y.ThesXrefTypeID AND
     y.ThesXrefTypeID = 30;
+
+-- VIEW Materials
+
+CREATE OR REPLACE VIEW vmaterials AS
+SELECT o.ObjectID as _id,
+    t.Term as material,
+    t.TermID
+FROM Terms t, 
+    CITvgsrpObjTombstoneD_RO o,
+    ThesXrefs x,
+    ThesXrefTypes y
+WHERE
+    x.TermID = t.TermID AND
+    x.ID = o.ObjectID AND
+    x.ThesXrefTypeID = y.ThesXrefTypeID AND
+    y.ThesXrefTypeID = 5;
 
 -- VIEW Data PIDS
 
@@ -228,4 +260,14 @@ JOIN
 WHERE
   lan.Label = 'Nederlands'
 AND tit.DisplayOrder = 1
-AND tit.Displayed = 1
+AND tit.Displayed = 1;
+
+-- VIEW Descriptions
+
+CREATE OR REPLACE VIEW vdescriptions AS
+SELECT o.ObjectID as _id,
+    d.Chat as description
+FROM CITvgsrpObjTombstoneD_RO o,
+    Objects d
+WHERE
+    d.ObjectID = o.ObjectID;
