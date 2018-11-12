@@ -144,7 +144,7 @@ sub __workpids {
 
 sub __representationpids {
     my $self = shift;
-    $self->prepare_call('SELECT * FROM vperiods', 'representationpids');
+    $self->prepare_call('SELECT * FROM vrepresentationpids', 'representationpids');
 }
 
 sub __dimensions {
