@@ -125,14 +125,14 @@ SELECT o.ObjectID as _id, o.ObjectNumber, c.ConstituentID, c.AlphaSort, c.Displa
    INNER JOIN ConXrefs cr ON cr.ID = o.ObjectID AND cr.TableID = 108 AND cr.RoleTypeID = 1
    INNER JOIN (SELECT DISTINCT ConXrefID, ConstituentID FROM ConXrefDetails) cd ON cd.ConXRefID = cr.ConXrefID
    LEFT JOIN Roles r ON r.RoleID = cr.RoleID
-   INNER JOIN Constituents c ON c.ConstituentID = cd.ConstituentID
+   INNER JOIN Constituents c ON c.ConstituentID = cd.ConstituentID;
 
 -- VIEW Classifications
 
 CREATE OR REPLACE VIEW vclassifications AS
 SELECT o.ObjectID as _id, o.ObjectNumber, c.ClassificationID, c.Classification FROM Objects o
   INNER JOIN ClassificationXRefs cr ON o.ObjectID = cr.ID
-  INNER JOIN Classifications c ON c.ClassificationID = cr.ClassificationID
+  INNER JOIN Classifications c ON c.ClassificationID = cr.ClassificationID;
 
 -- VIEW Periods
 
