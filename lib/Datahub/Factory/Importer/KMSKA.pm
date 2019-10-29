@@ -59,6 +59,8 @@ sub prepare {
     $self->__objtitles();
     $self->logger->info('Adding "descriptions" temporary table.');
     $self->__descriptions();
+    $self->logger->info('Adding "departments" temporary table.');
+    $self->__departments();
 }
 
 sub prepare_call {
@@ -175,6 +177,11 @@ sub __objtitles {
 sub __descriptions {
     my $self = shift;
     $self->prepare_call('SELECT * FROM vdescriptions', 'descriptions');
+}
+
+sub __departments {
+    my $self = shift;
+    $self->prepare_call('SELECT * FROM vdepartments', 'departments');
 }
 
 1;

@@ -271,3 +271,14 @@ FROM CITvgsrpObjTombstoneD_RO o,
     Objects d
 WHERE
     d.ObjectID = o.ObjectID;
+
+-- VIEW Departments
+
+CREATE OR REPLACE VIEW vdepartments AS
+SELECT o.ObjectID as _id,
+    d.DepartmentID,
+    d.Department as department
+FROM CITvgsrpObjTombstoneD_RO o,
+    Departments d
+WHERE
+    o.DepartmentID = d.DepartmentID;
