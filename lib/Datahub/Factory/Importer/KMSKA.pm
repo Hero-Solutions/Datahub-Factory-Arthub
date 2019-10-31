@@ -55,7 +55,7 @@ sub prepare {
     $self->__representationpids();
     $self->logger->info('Adding "workpids" temporary table.');
     $self->__workpids();
-    $self->logger->info('Adding "objecttitles" temporary table.');
+    $self->logger->info('Adding "objtitles" temporary table.');
     $self->__objtitles();
     $self->logger->info('Adding "descriptions" temporary table.');
     $self->__descriptions();
@@ -171,7 +171,7 @@ sub __materials {
 
 sub __objtitles {
     my $self = shift;
-    $self->prepare_call('SELECT * FROM vobjtitles', 'objtitles');
+    $self->merge_call('SELECT * FROM vobjtitles', 'objtitles');
 }
 
 sub __descriptions {

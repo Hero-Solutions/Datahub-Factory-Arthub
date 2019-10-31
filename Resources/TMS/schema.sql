@@ -297,17 +297,15 @@ WHERE userFieldID = '48';
 CREATE OR REPLACE VIEW vobjtitles AS
 SELECT obj.ObjectNumber as _id, 
     tit.titleID as titleid,
-    tit.Title as title
+    tit.Title as title,
+    tit.LanguageID as languageid,
+    tit.DisplayOrder as displayorder
 FROM
-   Objects obj
+    Objects obj
 LEFT JOIN
-  ObjTitles tit ON tit.ObjectID = obj.ObjectID
+    ObjTitles tit ON tit.ObjectID = obj.ObjectID
 JOIN
-  DDLanguages lan ON tit.LanguageID = lan.LanguageID
-WHERE
-  lan.Label = 'Nederlands'
-AND tit.DisplayOrder = 1
-AND tit.Displayed = 1;
+    DDLanguages lan ON tit.LanguageID = lan.LanguageID;
 
 -- VIEW Descriptions
 
