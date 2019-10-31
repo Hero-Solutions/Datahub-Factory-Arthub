@@ -12,27 +12,61 @@
 -- 
 -- INDEXES
 
+-- Procedure to drop indexes, but only if they already exist
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `sp_DropIndex` $$
+CREATE PROCEDURE `sp_DropIndex` (tblName VARCHAR(64),ndxName VARCHAR(64))
+BEGIN
+
+    DECLARE IndexColumnCougit nt INT;
+    DECLARE SQLStatement VARCHAR(256);
+
+    SELECT COUNT(1) INTO IndexColumnCount
+    FROM information_schema.statistics
+    WHERE table_schema = database()
+    AND table_name = tblName
+    AND index_name = ndxName;
+
+    IF IndexColumnCount > 0 THEN
+        SET SQLStatement = CONCAT('ALTER TABLE `',tblName,'` DROP INDEX`',ndxName,'`');
+        SET @SQLStmt = SQLStatement;
+        PREPARE s FROM @SQLStmt;
+        EXECUTE s;
+        DEALLOCATE PREPARE s;
+    END IF;
+
+END $$
+
+DELIMITER ;
+
 -- CITvgsrpObjTombstoneD_RO
 
-ALTER TABLE `CITvgsrpObjTombstoneD_RO` ADD INDEX ( `ObjectID` );
-ALTER TABLE `CITvgsrpObjTombstoneD_RO` ADD INDEX ( `ClassificationID` );
+CALL sp_DropIndex ('CITvgsrpObjTombstoneD_RO', 'ObjectID');
+ALTER TABLE `CITvgsrpObjTombstoneD_RO` ADD INDEX `ObjectID` ( `ObjectID` );
+CALL sp_DropIndex ('CITvgsrpObjTombstoneD_RO', 'ClassificationID');
+ALTER TABLE `CITvgsrpObjTombstoneD_RO` ADD INDEX `ClassificationID` ( `ClassificationID` );
 
 -- ObjTitles
 
 ALTER TABLE `ObjTitles` CHANGE `ObjectID` `ObjectID` VARCHAR( 255 ) NULL DEFAULT NULL;
-ALTER TABLE `ObjTitles` ADD INDEX ( `ObjectID` );
+CALL sp_DropIndex ('ObjTitles', 'ObjectID');
+ALTER TABLE `ObjTitles` ADD INDEX `ObjectID` ( `ObjectID` );
 
 -- Classifications
 
 ALTER TABLE `Classifications` CHANGE `ClassificationID` `ClassificationID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `Classifications` CHANGE `Classification` `Classification` VARCHAR( 255 ) NULL DEFAULT NULL ;
-ALTER TABLE `Classifications` ADD INDEX ( `ClassificationID` , `Classification` );
+CALL sp_DropIndex ('Classifications', 'ClassificationID');
+ALTER TABLE `Classifications` ADD INDEX `ClassificationID` ( `ClassificationID` , `Classification` );
 
 -- ClassificationXRefs
 
 ALTER TABLE `ClassificationXRefs` CHANGE `ID` `ID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `ClassificationXRefs` CHANGE `ClassificationID` `ClassificationID` VARCHAR( 255 ) NULL DEFAULT NULL;
-ALTER TABLE `ClassificationXRefs` ADD INDEX ( `ClassificationID`, `ID`);
+CALL sp_DropIndex ('ClassificationXRefs', 'ClassificationID');
+ALTER TABLE `ClassificationXRefs` ADD INDEX `ClassificationID` ( `ClassificationID`, `ID`);
 
 -- ConXrefDetails
 
@@ -40,7 +74,8 @@ ALTER TABLE `ConXrefDetails` CHANGE `ConXrefDetailID` `ConXrefDetailID` VARCHAR(
 ALTER TABLE `ConXrefDetails` CHANGE `ConXrefID` `ConXrefID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `ConXrefDetails` CHANGE `RoleTypeID` `RoleTypeID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `ConXrefDetails` CHANGE `ConstituentID` `ConstituentID` VARCHAR( 255 ) NULL DEFAULT NULL;
-ALTER TABLE `ConXrefDetails` ADD INDEX ( `ConXrefDetailID`, `ConXrefID`, `RoleTypeID`, `ConstituentID` );
+CALL sp_DropIndex ('ConXrefDetails', 'ConXrefDetailID');
+ALTER TABLE `ConXrefDetails` ADD INDEX `ConXrefDetailID` ( `ConXrefDetailID`, `ConXrefID`, `RoleTypeID`, `ConstituentID` );
 
 -- ConXrefs
 
@@ -48,38 +83,45 @@ ALTER TABLE `ConXrefs` CHANGE `ConXrefID` `ConXrefID` VARCHAR( 255 ) NULL DEFAUL
 ALTER TABLE `ConXrefs` CHANGE `RoleID` `RoleID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `ConXrefs` CHANGE `RoleTypeID` `RoleTypeID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `ConXrefs` CHANGE `TableID` `TableID` VARCHAR( 255 ) NULL DEFAULT NULL;
-ALTER TABLE `ConXrefs` ADD INDEX ( `ConXrefID`, `RoleID`, `RoleTypeID`, `TableID` );
+CALL sp_DropIndex ('ConXrefs', 'ConXrefID');
+ALTER TABLE `ConXrefs` ADD INDEX `ConXrefID` ( `ConXrefID`, `RoleID`, `RoleTypeID`, `TableID` );
 
 -- ObjContext (ObjectID)
 
 ALTER TABLE `ObjContext` CHANGE `Period` `Period` VARCHAR( 255 ) NULL DEFAULT NULL;
-ALTER TABLE `ObjContext` ADD INDEX ( `ObjectID` , `Period` );
+CALL sp_DropIndex ('ObjContext', 'ObjectID');
+ALTER TABLE `ObjContext` ADD INDEX `ObjectID` ( `ObjectID` , `Period` );
 
 -- Objects
 
-ALTER TABLE `Objects` ADD INDEX ( `ObjectID` , `ObjectNumber` );
+CALL sp_DropIndex ('Objects', 'ObjectID');
+ALTER TABLE `Objects` ADD INDEX `ObjectID` ( `ObjectID` , `ObjectNumber` );
 
 -- Dimensions
 
 ALTER TABLE `Dimensions` CHANGE `DimItemElemXrefID` `DimItemElemXrefID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `Dimensions` CHANGE `DimensionTypeID` `DimensionTypeID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `Dimensions` CHANGE `PrimaryUnitID` `PrimaryUnitID` VARCHAR( 255 ) NULL DEFAULT NULL;
-ALTER TABLE `Dimensions` ADD INDEX ( `DimItemElemXrefID` , `DimensionTypeID` ,  `PrimaryUnitID`);
+CALL sp_DropIndex ('Dimensions', 'DimItemElemXrefID');
+ALTER TABLE `Dimensions` ADD INDEX `DimItemElemXrefID` ( `DimItemElemXrefID` , `DimensionTypeID` ,  `PrimaryUnitID`);
 
 -- DimensionTypes
 
 ALTER TABLE `DimensionTypes` CHANGE `DimensionTypeID` `DimensionTypeID` VARCHAR( 255 ) NULL DEFAULT NULL;
-ALTER TABLE `DimensionTypes` ADD INDEX ( `DimensionTypeID` );
+CALL sp_DropIndex ('DimensionTypes', 'DimensionTypeID');
+ALTER TABLE `DimensionTypes` ADD INDEX `DimensionTypeID` ( `DimensionTypeID` );
 
 -- DimensionElements
 
 ALTER TABLE `DimensionElements` CHANGE `ElementID` `ElementID` VARCHAR( 255 ) NULL DEFAULT NULL;
-ALTER TABLE `DimensionElements` ADD INDEX ( `ElementID` );
+CALL sp_DropIndex ('DimensionElements', 'ElementID');
+ALTER TABLE `DimensionElements` ADD INDEX `ElementID` ( `ElementID` );
 
 -- DimensionUnits
 
 ALTER TABLE `DimensionUnits` CHANGE `UnitID` `UnitID` VARCHAR( 255 ) NULL DEFAULT NULL;
-ALTER TABLE `DimensionUnits` ADD INDEX ( `UnitID` );
+CALL sp_DropIndex ('DimensionUnits', 'UnitID');
+ALTER TABLE `DimensionUnits` ADD INDEX `UnitID` ( `UnitID` );
 
 -- DimItemElemXrefs
 
@@ -87,25 +129,29 @@ ALTER TABLE `DimItemElemXrefs` CHANGE `DimItemElemXrefID` `DimItemElemXrefID` IN
 ALTER TABLE `DimItemElemXrefs` CHANGE `TableID` `TableID` INT( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `DimItemElemXrefs` CHANGE `ID` `ID` INT( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `DimItemElemXrefs` CHANGE `ElementID` `ElementID` INT( 255 ) NULL DEFAULT NULL;
-ALTER TABLE `DimItemElemXrefs` ADD INDEX ( `DimItemElemXrefID` , `TableID` , `ID` , `ElementID` );
+CALL sp_DropIndex ('DimItemElemXrefs', 'DimItemElemXrefID');
+ALTER TABLE `DimItemElemXrefs` ADD INDEX `DimItemElemXrefID` ( `DimItemElemXrefID` , `TableID` , `ID` , `ElementID` );
 
 -- Terms
 
 ALTER TABLE `Terms` CHANGE `TermID` `TermID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `Terms` CHANGE `TermTypeID` `TermTypeID` VARCHAR( 255 ) NULL DEFAULT NULL;
-ALTER TABLE `Terms` ADD INDEX ( `TermID` , `TermTypeID` );
+CALL sp_DropIndex ('Terms', 'TermID');
+ALTER TABLE `Terms` ADD INDEX `TermID` ( `TermID` , `TermTypeID` );
 
 -- ThesXrefs
 
 ALTER TABLE `ThesXrefs` CHANGE `ID` `ID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `ThesXrefs` CHANGE `TermID` `TermID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `ThesXrefs` CHANGE `ThesXrefTypeID` `ThesXrefTypeID` VARCHAR( 255 ) NULL DEFAULT NULL;
-ALTER TABLE `ThesXrefs` ADD INDEX ( `ID` , `TermID` , `ThesXrefTypeID` );
+CALL sp_DropIndex ('ThesXrefs', 'ID');
+ALTER TABLE `ThesXrefs` ADD INDEX `ID` ( `ID` , `TermID` , `ThesXrefTypeID` );
 
 -- ThesXrefTypes
 
 ALTER TABLE `ThesXrefTypes` CHANGE `ThesXrefTypeID` `ThesXrefTypeID` VARCHAR( 255 ) NULL DEFAULT NULL;
-ALTER TABLE `ThesXrefTypes` ADD INDEX ( `ThesXrefTypeID` );
+CALL sp_DropIndex ('ThesXrefTypes', 'ThesXrefTypeID');
+ALTER TABLE `ThesXrefTypes` ADD INDEX `ThesXrefTypeID` ( `ThesXrefTypeID` );
 
 -- UserFieldXrefs
 
@@ -113,7 +159,8 @@ ALTER TABLE `UserFieldXrefs` CHANGE `UserFieldID` `UserFieldID` VARCHAR( 255 ) N
 ALTER TABLE `UserFieldXrefs` CHANGE `ID` `ID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `UserFieldXrefs` CHANGE `ContextID` `ContextID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `UserFieldXrefs` CHANGE `LoginID` `LoginID` VARCHAR( 255 ) NULL DEFAULT NULL;
-ALTER TABLE `UserFieldXrefs` ADD INDEX ( `UserFieldID`, `ID`, `ContextID`, `LoginID` );
+CALL sp_DropIndex ('UserFieldXrefs', 'UserFieldID');
+ALTER TABLE `UserFieldXrefs` ADD INDEX `UserFieldID` ( `UserFieldID`, `ID`, `ContextID`, `LoginID` );
 
 --
 -- VIEWS
