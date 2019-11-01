@@ -298,14 +298,31 @@ CREATE OR REPLACE VIEW vobjtitles AS
 SELECT obj.ObjectNumber as _id, 
     tit.titleID as titleid,
     tit.Title as title,
-    tit.LanguageID as languageid,
-    tit.DisplayOrder as displayorder
+    tit.LanguageID as languageid
 FROM
     Objects obj
 LEFT JOIN
-    ObjTitles tit ON tit.ObjectID = obj.ObjectID
-JOIN
-    DDLanguages lan ON tit.LanguageID = lan.LanguageID;
+    (
+        SELECT ObjTitles.ObjectID,
+            ObjTitles.titleID,
+            ObjTitles.Title,
+            ObjTitles.LanguageID
+        FROM
+            (
+                SELECT ObjectID,
+                    LanguageID,
+                    MIN(DisplayOrder) as displayorder
+                FROM
+                    ObjTitles
+                GROUP BY
+                    ObjectID,
+                    LanguageID
+            ) AS lowest
+        INNER JOIN
+            ObjTitles ON ObjTitles.ObjectID = lowest.ObjectID
+            AND ObjTitles.LanguageID = lowest.LanguageID
+            AND ObjTitles.DisplayOrder = lowest.displayorder
+    ) AS tit ON tit.ObjectID = obj.ObjectID;
 
 -- VIEW Descriptions
 
