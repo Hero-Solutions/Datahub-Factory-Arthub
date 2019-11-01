@@ -171,7 +171,7 @@ sub __materials {
 
 sub __objtitles {
     my $self = shift;
-    $self->merge_call('SELECT * FROM vobjtitles', 'objtitles');
+    $self->merge_call('SELECT * FROM vobjtitles', 'objtitles', 'objtitles');
 }
 
 sub __descriptions {
