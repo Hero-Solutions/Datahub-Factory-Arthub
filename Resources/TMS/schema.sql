@@ -17,10 +17,10 @@
 DELIMITER $$
 
 DROP PROCEDURE IF EXISTS `sp_DropIndex` $$
-CREATE PROCEDURE `sp_DropIndex` (tblName VARCHAR(64),ndxName VARCHAR(64))
+CREATE PROCEDURE `sp_DropIndex` (tblName VARCHAR(64), ndxName VARCHAR(64))
 BEGIN
 
-    DECLARE IndexColumnCougit nt INT;
+    DECLARE IndexColumnCount INT;
     DECLARE SQLStatement VARCHAR(256);
 
     SELECT COUNT(1) INTO IndexColumnCount
