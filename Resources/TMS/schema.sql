@@ -348,3 +348,13 @@ FROM CITvgsrpObjTombstoneD_RO o,
     Departments d
 WHERE
     o.DepartmentID = d.DepartmentID;
+
+-- VIEW Iconclass
+
+CREATE OR REPLACE VIEW viconclass AS
+SELECT o.ObjectID as _id,
+    obj.Notes as iconclass
+FROM CITvgsrpObjTombstoneD_RO o,
+    Objects obj
+WHERE
+    obj.ObjectID = o.ObjectID;
