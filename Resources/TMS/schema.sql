@@ -170,11 +170,13 @@ ALTER TABLE `UserFieldXrefs` ADD INDEX `UserFieldID` ( `UserFieldID`, `ID`, `Con
 -- VIEW Constituents 
 
 CREATE OR REPLACE VIEW vconstituents AS
-SELECT o.ObjectID as _id, o.ObjectNumber, c.ConstituentID, c.AlphaSort, c.DisplayName, c.BeginDate, c.EndDate, c.BeginDateISO, c.EndDateISO, r.Role FROM Objects o
+SELECT o.ObjectID as _id, o.ObjectNumber, c.ConstituentID, c.AlphaSort, c.DisplayName, c.BeginDate, c.EndDate, c.BeginDateISO, c.EndDateISO, r.Role, cr.DisplayOrder, te.TextEntry as copyright FROM Objects o
    INNER JOIN ConXrefs cr ON cr.ID = o.ObjectID AND cr.TableID = 108 AND cr.RoleTypeID = 1
    INNER JOIN (SELECT DISTINCT ConXrefID, ConstituentID FROM ConXrefDetails) cd ON cd.ConXRefID = cr.ConXrefID
    LEFT JOIN Roles r ON r.RoleID = cr.RoleID
-   INNER JOIN Constituents c ON c.ConstituentID = cd.ConstituentID;
+   INNER JOIN Constituents c ON c.ConstituentID = cd.ConstituentID
+   LEFT JOIN TextEntries te ON te.ID = c.ConstituentID AND te.TextTypeID = 64
+ORDER BY cr.DisplayOrder;
 
 -- VIEW Classifications
 
