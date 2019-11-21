@@ -95,6 +95,8 @@ ALTER TABLE `ObjContext` ADD INDEX `ObjectID` ( `ObjectID` , `Period` );
 -- Objects
 
 CALL sp_DropIndex ('Objects', 'ObjectID');
+ALTER TABLE `Objects` CHANGE `ObjectID` `ObjectID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `Objects` CHANGE `ObjectNumber` `ObjectNumber` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `Objects` ADD INDEX `ObjectID` ( `ObjectID` , `ObjectNumber` );
 
 -- Dimensions
