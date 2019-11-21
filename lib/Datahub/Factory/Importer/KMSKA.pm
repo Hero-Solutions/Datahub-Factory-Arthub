@@ -61,6 +61,10 @@ sub prepare {
     $self->__descriptions();
     $self->logger->info('Adding "departments" temporary table.');
     $self->__departments();
+    $self->logger->info('Adding "iconclass" temporary table.');
+    $self->__iconclass();
+    $self->logger->info('Adding "relations" temporary table.');
+    $self->__relations();
 }
 
 sub prepare_call {
@@ -182,6 +186,16 @@ sub __descriptions {
 sub __departments {
     my $self = shift;
     $self->prepare_call('SELECT * FROM vdepartments', 'departments');
+}
+
+sub __iconclass {
+    my $self = shift;
+    $self->prepare_call('SELECT * FROM viconclass', 'iconclass');
+}
+
+sub __relations {
+    my $self = shift;
+    $self->merge_call('SELECT * FROM vrelations', 'relations', 'relations');
 }
 
 1;
