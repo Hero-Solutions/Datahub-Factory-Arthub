@@ -164,6 +164,21 @@ ALTER TABLE `UserFieldXrefs` CHANGE `LoginID` `LoginID` VARCHAR( 255 ) NULL DEFA
 CALL sp_DropIndex ('UserFieldXrefs', 'UserFieldID');
 ALTER TABLE `UserFieldXrefs` ADD INDEX `UserFieldID` ( `UserFieldID`, `ID`, `ContextID`, `LoginID` );
 
+-- Associations
+
+ALTER TABLE `Associations` CHANGE `AssociationID` `AssociationID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `Associations` CHANGE `ID1` `ID1` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `Associations` CHANGE `ID2` `ID2` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `Associations` CHANGE `RelationshipID` `RelationshipID` VARCHAR( 255 ) NULL DEFAULT NULL;
+CALL sp_DropIndex ('Associations', 'AssociationID');
+ALTER TABLE `Associations` ADD INDEX `AssociationID` ( `AssociationID`, `ID1`, `ID2`, `RelationshipID` );
+
+-- Relationships
+
+ALTER TABLE `Relationships` CHANGE `RelationshipID` `RelationshipID` VARCHAR( 255 ) NULL DEFAULT NULL;
+CALL sp_DropIndex ('Relationships', 'RelationshipID');
+ALTER TABLE `Relationships` ADD INDEX `RelationshipID` ( `RelationshipID` );
+
 --
 -- VIEWS
 
@@ -358,3 +373,38 @@ FROM CITvgsrpObjTombstoneD_RO o,
     Objects obj
 WHERE
     obj.ObjectID = o.ObjectID;
+
+-- VIEW Relations
+
+CREATE OR REPLACE VIEW vrelations AS
+(
+SELECT DISTINCT o.ObjectID as _id,
+    obj.ObjectNumber as relatedObjectNumber,
+    r.Relation2 as relationship,
+    r.RelationshipID as relationshipID1,
+    NULL as relationshipID2
+FROM CITvgsrpObjTombstoneD_RO o,
+    Associations a
+INNER JOIN
+    Relationships r ON r.RelationshipID = a.RelationshipID
+INNER JOIN
+    CITvgsrpObjTombstoneD_RO obj ON obj.ObjectID = a.ID2
+WHERE
+    o.ObjectID = a.ID1
+)
+UNION
+(
+SELECT DISTINCT o.ObjectID as _id,
+    obj.ObjectNumber as relatedObjectNumber,
+    r.Relation1 as relationship,
+    NULL as relationshipID1,
+    r.RelationshipID as relationshipID2
+FROM CITvgsrpObjTombstoneD_RO o,
+    Associations a
+INNER JOIN
+    Relationships r ON r.RelationshipID = a.RelationshipID
+INNER JOIN
+    CITvgsrpObjTombstoneD_RO obj ON obj.ObjectID = a.ID1
+WHERE
+    o.ObjectID = a.ID2
+);
