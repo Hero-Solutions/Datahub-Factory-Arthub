@@ -418,7 +418,7 @@ INNER JOIN
     Relationships r ON r.RelationshipID = a.RelationshipID
 INNER JOIN
     CITvgsrpObjTombstoneD_RO obj ON obj.ObjectID = a.ID2
-INNER JOIN
+LEFT JOIN
     AltNums n ON n.ID = a.ID2
 WHERE
     o.ObjectID = a.ID1
@@ -438,7 +438,7 @@ INNER JOIN
     Relationships r ON r.RelationshipID = a.RelationshipID
 INNER JOIN
     CITvgsrpObjTombstoneD_RO obj ON obj.ObjectID = a.ID1
-INNER JOIN
+LEFT JOIN
     AltNums n ON n.ID = a.ID1
 WHERE
     o.ObjectID = a.ID2
