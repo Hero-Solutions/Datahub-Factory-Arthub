@@ -51,6 +51,7 @@ ALTER TABLE `CITvgsrpObjTombstoneD_RO` ADD INDEX `ClassificationID` ( `Classific
 -- ObjTitles
 
 ALTER TABLE `ObjTitles` CHANGE `ObjectID` `ObjectID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `ObjTitles` CHANGE `DisplayOrder` `DisplayOrder` INT NULL DEFAULT NULL;
 CALL sp_DropIndex ('ObjTitles', 'ObjectID');
 ALTER TABLE `ObjTitles` ADD INDEX `ObjectID` ( `ObjectID` );
 
@@ -83,6 +84,7 @@ ALTER TABLE `ConXrefs` CHANGE `ConXrefID` `ConXrefID` VARCHAR( 255 ) NULL DEFAUL
 ALTER TABLE `ConXrefs` CHANGE `RoleID` `RoleID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `ConXrefs` CHANGE `RoleTypeID` `RoleTypeID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `ConXrefs` CHANGE `TableID` `TableID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `ConXrefs` CHANGE `DisplayOrder` `DisplayOrder` INT NULL DEFAULT NULL;
 CALL sp_DropIndex ('ConXrefs', 'ConXrefID');
 ALTER TABLE `ConXrefs` ADD INDEX `ConXrefID` ( `ConXrefID`, `RoleID`, `RoleTypeID`, `TableID` );
 
