@@ -419,7 +419,7 @@ INNER JOIN
 INNER JOIN
     CITvgsrpObjTombstoneD_RO obj ON obj.ObjectID = a.ID2
 LEFT JOIN
-    AltNums n ON n.ID = a.ID2
+    AltNums n ON n.ID = a.ID2 AND n.Description = 'paginanummer'
 WHERE
     o.ObjectID = a.ID1
 )
@@ -439,7 +439,7 @@ INNER JOIN
 INNER JOIN
     CITvgsrpObjTombstoneD_RO obj ON obj.ObjectID = a.ID1
 LEFT JOIN
-    AltNums n ON n.ID = a.ID1
+    AltNums n ON n.ID = a.ID1 AND n.Description = 'paginanummer'
 WHERE
     o.ObjectID = a.ID2
 );
