@@ -129,10 +129,10 @@ ALTER TABLE `DimensionUnits` ADD INDEX `UnitID` ( `UnitID` );
 
 -- DimItemElemXrefs
 
-ALTER TABLE `DimItemElemXrefs` CHANGE `DimItemElemXrefID` `DimItemElemXrefID` INT( 255 ) NULL DEFAULT NULL;
-ALTER TABLE `DimItemElemXrefs` CHANGE `TableID` `TableID` INT( 255 ) NULL DEFAULT NULL;
-ALTER TABLE `DimItemElemXrefs` CHANGE `ID` `ID` INT( 255 ) NULL DEFAULT NULL;
-ALTER TABLE `DimItemElemXrefs` CHANGE `ElementID` `ElementID` INT( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `DimItemElemXrefs` CHANGE `DimItemElemXrefID` `DimItemElemXrefID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `DimItemElemXrefs` CHANGE `TableID` `TableID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `DimItemElemXrefs` CHANGE `ID` `ID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `DimItemElemXrefs` CHANGE `ElementID` `ElementID` VARCHAR( 255 ) NULL DEFAULT NULL;
 CALL sp_DropIndex ('DimItemElemXrefs', 'DimItemElemXrefID');
 ALTER TABLE `DimItemElemXrefs` ADD INDEX `DimItemElemXrefID` ( `DimItemElemXrefID` , `TableID` , `ID` , `ElementID` );
 
