@@ -326,7 +326,8 @@ CREATE OR REPLACE VIEW vobjtitles AS
 SELECT obj.ObjectNumber as _id, 
     tit.titleID as titleid,
     tit.Title as title,
-    tit.LanguageID as languageid
+    tit.LanguageID as languageid,
+    tit.TitleTypeID as titletypeid
 FROM
     Objects obj
 LEFT JOIN
@@ -334,14 +335,30 @@ LEFT JOIN
         SELECT ObjTitles.ObjectID,
             ObjTitles.titleID,
             ObjTitles.Title,
-            ObjTitles.LanguageID
+            ObjTitles.LanguageID,
+            ObjTitles.TitleTypeID
         FROM
             (
-                SELECT ObjectID,
-                    LanguageID,
-                    MIN(DisplayOrder) as displayorder
+                SELECT ObjTitles.ObjectID,
+                    ObjTitles.LanguageID,
+                    ObjTitles.TitleTypeID,
+                    MIN(ObjTitles.DisplayOrder) as displayorder
                 FROM
-                    ObjTitles
+                    (
+                        SELECT ObjectID,
+                            LanguageID,
+                            MIN(TitleTypeID) as TitleTypeID
+                        FROM
+                            ObjTitles
+                        WHERE
+                            TitleTypeID = 1 OR TitleTypeID = 2
+                        GROUP BY
+                            ObjectID,
+                            LanguageID
+                    ) AS lowestttid
+                INNER JOIN ObjTitles ON ObjTitles.ObjectID = lowestttid.ObjectID
+                           AND ObjTitles.LanguageID = lowestttid.LanguageID
+                           AND ObjTitles.TitleTypeID = lowestttid.TitleTypeID
                 GROUP BY
                     ObjectID,
                     LanguageID
@@ -349,6 +366,7 @@ LEFT JOIN
         INNER JOIN
             ObjTitles ON ObjTitles.ObjectID = lowest.ObjectID
             AND ObjTitles.LanguageID = lowest.LanguageID
+            AND ObjTitles.TitleTypeID = lowest.TitleTypeID
             AND ObjTitles.DisplayOrder = lowest.displayorder
     ) AS tit ON tit.ObjectID = obj.ObjectID;
 
