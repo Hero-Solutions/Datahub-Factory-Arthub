@@ -181,6 +181,13 @@ ALTER TABLE `Relationships` CHANGE `RelationshipID` `RelationshipID` VARCHAR( 25
 CALL sp_DropIndex ('Relationships', 'RelationshipID');
 ALTER TABLE `Relationships` ADD INDEX `RelationshipID` ( `RelationshipID` );
 
+-- AltNums
+
+ALTER TABLE `AltNums` CHANGE `AltNumID` `AltNumID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `AltNums` CHANGE `ID` `ID` VARCHAR( 255 ) NULL DEFAULT NULL;
+CALL sp_DropIndex ('AltNums', 'AltNumID');
+ALTER TABLE `AltNums` ADD INDEX `AltNumID` ( `AltNumID` , `ID` );
+
 --
 -- VIEWS
 
@@ -384,13 +391,17 @@ SELECT DISTINCT o.ObjectID as _id,
     obj.ObjectNumber as relatedObjectNumber,
     r.Relation2 as relationship,
     r.RelationshipID as relationshipID1,
-    NULL as relationshipID2
+    NULL as relationshipID2,
+    n.AltNum as numbering,
+    n.Description as descriptionNumbering
 FROM CITvgsrpObjTombstoneD_RO o,
     Associations a
 INNER JOIN
     Relationships r ON r.RelationshipID = a.RelationshipID
 INNER JOIN
     CITvgsrpObjTombstoneD_RO obj ON obj.ObjectID = a.ID2
+INNER JOIN
+    AltNums n ON n.ID = a.ID2
 WHERE
     o.ObjectID = a.ID1
 )
@@ -400,13 +411,17 @@ SELECT DISTINCT o.ObjectID as _id,
     obj.ObjectNumber as relatedObjectNumber,
     r.Relation1 as relationship,
     NULL as relationshipID1,
-    r.RelationshipID as relationshipID2
+    r.RelationshipID as relationshipID2,
+    n.AltNum as numbering,
+    n.Description as descriptionNumbering
 FROM CITvgsrpObjTombstoneD_RO o,
     Associations a
 INNER JOIN
     Relationships r ON r.RelationshipID = a.RelationshipID
 INNER JOIN
     CITvgsrpObjTombstoneD_RO obj ON obj.ObjectID = a.ID1
+INNER JOIN
+    AltNums n ON n.ID = a.ID1
 WHERE
     o.ObjectID = a.ID2
 );
