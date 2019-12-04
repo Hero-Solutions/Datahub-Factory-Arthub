@@ -55,10 +55,16 @@ sub prepare {
     $self->__representationpids();
     $self->logger->info('Adding "workpids" temporary table.');
     $self->__workpids();
-    $self->logger->info('Adding "objecttitles" temporary table.');
+    $self->logger->info('Adding "objtitles" temporary table.');
     $self->__objtitles();
     $self->logger->info('Adding "descriptions" temporary table.');
     $self->__descriptions();
+    $self->logger->info('Adding "departments" temporary table.');
+    $self->__departments();
+    $self->logger->info('Adding "iconclass" temporary table.');
+    $self->__iconclass();
+    $self->logger->info('Adding "relations" temporary table.');
+    $self->__relations();
 }
 
 sub prepare_call {
@@ -169,12 +175,27 @@ sub __materials {
 
 sub __objtitles {
     my $self = shift;
-    $self->prepare_call('SELECT * FROM vobjtitles', 'objtitles');
+    $self->merge_call('SELECT * FROM vobjtitles', 'objtitles', 'objtitles');
 }
 
 sub __descriptions {
     my $self = shift;
     $self->prepare_call('SELECT * FROM vdescriptions', 'descriptions');
+}
+
+sub __departments {
+    my $self = shift;
+    $self->prepare_call('SELECT * FROM vdepartments', 'departments');
+}
+
+sub __iconclass {
+    my $self = shift;
+    $self->prepare_call('SELECT * FROM viconclass', 'iconclass');
+}
+
+sub __relations {
+    my $self = shift;
+    $self->merge_call('SELECT * FROM vrelations', 'relations', 'relations');
 }
 
 1;
