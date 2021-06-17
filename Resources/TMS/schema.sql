@@ -188,6 +188,27 @@ ALTER TABLE `AltNums` CHANGE `ID` `ID` VARCHAR( 255 ) NULL DEFAULT NULL;
 CALL sp_DropIndex ('AltNums', 'AltNumID');
 ALTER TABLE `AltNums` ADD INDEX `AltNumID` ( `AltNumID` , `ID` );
 
+-- Locations
+
+ALTER TABLE `Locations` CHANGE `LocationID` `LocationID` VARCHAR( 255 ) NULL DEFAULT NULL;
+CALL sp_DropIndex ('Locations', 'LocationID');
+ALTER TABLE `Locations` ADD INDEX `LocationID` ( `LocationID` );
+
+-- ObjLocations
+
+ALTER TABLE `ObjLocations` CHANGE `ObjLocationID` `ObjLocationID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `ObjLocations` CHANGE `LocationID` `LocationID` VARCHAR( 255 ) NULL DEFAULT NULL;
+CALL sp_DropIndex ('ObjLocations', 'ObjLocationID');
+ALTER TABLE `ObjLocations` ADD INDEX `ObjLocationID` ( `ObjLocationID` , `LocationID` );
+
+-- ObjComponents
+
+ALTER TABLE `ObjComponents` CHANGE `ComponentID` `ComponentID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `ObjComponents` CHANGE `CurrentObjLocID` `CurrentObjLocID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `ObjComponents` CHANGE `ObjectID` `ObjectID` VARCHAR( 255 ) NULL DEFAULT NULL;
+CALL sp_DropIndex ('ObjComponents', 'ComponentID');
+ALTER TABLE `ObjComponents` ADD INDEX `ComponentID` ( `ComponentID` , `CurrentObjLocID` , `ObjectID` );
+
 --
 -- VIEWS
 
@@ -287,6 +308,22 @@ WHERE
     x.ThesXrefTypeID = y.ThesXrefTypeID AND
     y.ThesXrefTypeID = 5;
 
+-- VIEW Techniques
+
+CREATE OR REPLACE VIEW vtechniques AS
+SELECT o.ObjectID as _id,
+    t.Term as technique,
+    t.TermID
+FROM Terms t,
+    CITvgsrpObjTombstoneD_RO o,
+    ThesXrefs x,
+    ThesXrefTypes y
+WHERE
+    x.TermID = t.TermID AND
+    x.ID = o.ObjectID AND
+    x.ThesXrefTypeID = y.ThesXrefTypeID AND
+    y.ThesXrefTypeID = 6;
+
 -- VIEW Data PIDS
 
 CREATE OR REPLACE VIEW vdatapids AS
@@ -327,7 +364,9 @@ SELECT obj.ObjectNumber as _id,
     tit.titleID as titleid,
     tit.Title as title,
     tit.LanguageID as languageid,
-    tit.TitleTypeID as titletypeid
+    tit.TitleTypeID as titletypeid,
+    tit.Displayed as displayed,
+    tit.Active as active
 FROM
     Objects obj
 LEFT JOIN
@@ -336,7 +375,9 @@ LEFT JOIN
             ObjTitles.titleID,
             ObjTitles.Title,
             ObjTitles.LanguageID,
-            ObjTitles.TitleTypeID
+            ObjTitles.TitleTypeID,
+            ObjTitles.Displayed,
+            ObjTitles.Active
         FROM
             (
                 SELECT ObjTitles.ObjectID,
@@ -351,7 +392,7 @@ LEFT JOIN
                         FROM
                             ObjTitles
                         WHERE
-                            TitleTypeID = 1 OR TitleTypeID = 2
+                            (TitleTypeID = 1 OR TitleTypeID = 2) AND Displayed = 1 AND Active = 1
                         GROUP BY
                             ObjectID,
                             LanguageID
@@ -443,3 +484,26 @@ LEFT JOIN
 WHERE
     o.ObjectID = a.ID2
 );
+
+-- VIEW Inscriptions
+
+CREATE OR REPLACE VIEW vinscriptions AS
+SELECT ObjectID as _id,
+    o.ObjectNumber as objectNumber,
+    o.Inscribed as inscription
+FROM Objects o;
+
+-- VIEW Locations
+
+CREATE OR REPLACE VIEW vlocations AS
+SELECT o.ObjectID as _id,
+    l.Room as room
+FROM Locations l
+INNER JOIN
+    ObjLocations ol ON l.LocationID = ol.LocationID
+INNER JOIN
+    ObjComponents oc ON ol.ObjLocationID = oc.CurrentObjLocID
+INNER JOIN
+    Objects o ON oc.ObjectID = o.ObjectID
+WHERE
+    l.Site = 'publieksruimte';
