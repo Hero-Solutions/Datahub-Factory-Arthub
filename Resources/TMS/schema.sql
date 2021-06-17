@@ -485,6 +485,15 @@ WHERE
     o.ObjectID = a.ID2
 );
 
+-- VIEW PageNumbers
+
+CREATE OR REPLACE VIEW vpagenumbers AS
+SELECT o.ObjectID as _id,
+    a.AltNum as pageNumber,
+FROM CITvgsrpObjTombstoneD_RO o,
+    AltNums a
+WHERE o.ObjectID = a.ID AND a.Description = 'paginanummer';
+
 -- VIEW Inscriptions
 
 CREATE OR REPLACE VIEW vinscriptions AS

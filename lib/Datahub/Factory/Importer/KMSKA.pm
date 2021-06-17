@@ -67,6 +67,8 @@ sub prepare {
     $self->__iconclass();
     $self->logger->info('Adding "relations" temporary table.');
     $self->__relations();
+    $self->logger->info('Adding "pagenumbers" temporary table.');
+    $self->__pagenumbers();
     $self->logger->info('Adding "inscriptions" temporary table.');
     $self->__inscriptions();
     $self->logger->info('Adding "locations" temporary table.');
@@ -207,6 +209,11 @@ sub __iconclass {
 sub __relations {
     my $self = shift;
     $self->merge_call('SELECT * FROM vrelations', 'relations', 'relations');
+}
+
+sub __pagenumbers {
+    my $self = shift;
+    $self->prepare_call('SELECT * FROM vpagenumbers', 'pagenumbers');
 }
 
 sub __inscriptions {
