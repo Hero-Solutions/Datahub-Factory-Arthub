@@ -47,6 +47,8 @@ sub prepare {
     $self->__subjects();
     $self->logger->info('Adding "materials" temporary table.');
     $self->__materials();
+    $self->logger->info('Adding "techniques" temporary table.');
+    $self->__techniques();
     $self->logger->info('Adding "constituents" temporary table.');
     $self->__constituents();
     $self->logger->info('Adding "datapids" temporary table.');
@@ -65,6 +67,10 @@ sub prepare {
     $self->__iconclass();
     $self->logger->info('Adding "relations" temporary table.');
     $self->__relations();
+    $self->logger->info('Adding "inscriptions" temporary table.');
+    $self->__inscriptions();
+    $self->logger->info('Adding "locations" temporary table.');
+    $self->__locations();
 }
 
 sub prepare_call {
@@ -173,6 +179,11 @@ sub __materials {
     $self->merge_call('SELECT * FROM vmaterials', 'materials', 'materials');
 }
 
+sub __techniques {
+    my $self = shift;
+    $self->merge_call('SELECT * FROM vtechniques', 'techniques', 'techniques');
+}
+
 sub __objtitles {
     my $self = shift;
     $self->merge_call('SELECT * FROM vobjtitles', 'objtitles', 'objtitles');
@@ -196,6 +207,16 @@ sub __iconclass {
 sub __relations {
     my $self = shift;
     $self->merge_call('SELECT * FROM vrelations', 'relations', 'relations');
+}
+
+sub __inscriptions {
+    my $self = shift;
+    $self->merge_call('SELECT * FROM vinscriptions', 'inscriptions', 'inscriptions');
+}
+
+sub __locations {
+    my $self = shift;
+    $self->prepare_call('SELECT * FROM vlocations', 'locations');
 }
 
 1;
