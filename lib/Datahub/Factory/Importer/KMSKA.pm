@@ -22,7 +22,7 @@ sub _build_importer {
     my $self = shift;
     my $dsn = sprintf('dbi:mysql:%s', $self->db_name);
 
-    my $query = 'select * from CITvgsrpObjTombstoneD_RO;';
+    my $query = 'SELECT * FROM Objects;';
     my $importer = Catmandu->importer('DBI', dsn => $dsn, host => $self->db_host, user => $self->db_user, password => $self->db_password, query => $query, encoding => ':iso-8859-1');
 
     if ($self->generate_temp_tables) {

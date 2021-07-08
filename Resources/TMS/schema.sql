@@ -41,19 +41,34 @@ END $$
 
 DELIMITER ;
 
--- CITvgsrpObjTombstoneD_RO
-
-CALL sp_DropIndex ('CITvgsrpObjTombstoneD_RO', 'ObjectID');
-ALTER TABLE `CITvgsrpObjTombstoneD_RO` ADD INDEX `ObjectID` ( `ObjectID` );
-CALL sp_DropIndex ('CITvgsrpObjTombstoneD_RO', 'ClassificationID');
-ALTER TABLE `CITvgsrpObjTombstoneD_RO` ADD INDEX `ClassificationID` ( `ClassificationID` );
-
 -- ObjTitles
 
 ALTER TABLE `ObjTitles` CHANGE `ObjectID` `ObjectID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `ObjTitles` CHANGE `LanguageID` `LanguageID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `ObjTitles` CHANGE `TitleTypeID` `TitleTypeID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `ObjTitles` CHANGE `DisplayOrder` `DisplayOrder` INT NULL DEFAULT NULL;
+ALTER TABLE `ObjTitles` CHANGE `Displayed` `Displayed` INT NULL DEFAULT NULL;
+ALTER TABLE `ObjTitles` CHANGE `Active` `Active` INT NULL DEFAULT NULL;
 CALL sp_DropIndex ('ObjTitles', 'ObjectID');
 ALTER TABLE `ObjTitles` ADD INDEX `ObjectID` ( `ObjectID` );
+CALL sp_DropIndex ('ObjTitles', 'LanguageID');
+ALTER TABLE `ObjTitles` ADD INDEX `LanguageID` ( `LanguageID` );
+CALL sp_DropIndex ('ObjTitles', 'TitleTypeID');
+ALTER TABLE `ObjTitles` ADD INDEX `TitleTypeID` ( `TitleTypeID` );
+CALL sp_DropIndex ('ObjTitles', 'DisplayOrder');
+ALTER TABLE `ObjTitles` ADD INDEX `DisplayOrder` ( `DisplayOrder` );
+CALL sp_DropIndex ('ObjTitles', 'Displayed');
+ALTER TABLE `ObjTitles` ADD INDEX `Displayed` ( `Displayed` );
+CALL sp_DropIndex ('ObjTitles', 'Active');
+ALTER TABLE `ObjTitles` ADD INDEX `Active` ( `Active` );
+
+-- DDLanguages
+ALTER TABLE `DDLanguages` CHANGE `LanguageID` `LanguageID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `DDLanguages` CHANGE `ISO369v1Code` `ISO369v1Code` VARCHAR( 255 ) NULL DEFAULT NULL;
+CALL sp_DropIndex ('DDLanguages', 'LanguageID');
+ALTER TABLE `DDLanguages` ADD INDEX `LanguageID` ( `LanguageID` );
+CALL sp_DropIndex ('DDLanguages', 'ISO369v1Code');
+ALTER TABLE `DDLanguages` ADD INDEX `ISO369v1Code` ( `ISO369v1Code` );
 
 -- Classifications
 
@@ -82,13 +97,24 @@ ALTER TABLE `ConXrefDetails` ADD INDEX `ConstituentID` ( `ConstituentID` );
 
 -- ConXrefs
 
+ALTER TABLE `ConXrefs` CHANGE `ID` `ID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `ConXrefs` CHANGE `ConXrefID` `ConXrefID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `ConXrefs` CHANGE `RoleID` `RoleID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `ConXrefs` CHANGE `RoleTypeID` `RoleTypeID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `ConXrefs` CHANGE `TableID` `TableID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `ConXrefs` CHANGE `DisplayOrder` `DisplayOrder` INT NULL DEFAULT NULL;
+CALL sp_DropIndex ('ConXrefs', 'ID');
+ALTER TABLE `ConXrefs` ADD INDEX `ID` ( `ID` );
 CALL sp_DropIndex ('ConXrefs', 'ConXrefID');
-ALTER TABLE `ConXrefs` ADD INDEX `ConXrefID` ( `ConXrefID`, `RoleID`, `RoleTypeID`, `TableID` );
+ALTER TABLE `ConXrefs` ADD INDEX `ConXrefID` ( `ConXrefID` );
+CALL sp_DropIndex ('ConXrefs', 'RoleID');
+ALTER TABLE `ConXrefs` ADD INDEX `RoleID` ( `RoleID` );
+CALL sp_DropIndex ('ConXrefs', 'RoleTypeID');
+ALTER TABLE `ConXrefs` ADD INDEX `RoleTypeID` ( `RoleTypeID` );
+CALL sp_DropIndex ('ConXrefs', 'TableID');
+ALTER TABLE `ConXrefs` ADD INDEX `TableID` ( `TableID` );
+CALL sp_DropIndex ('ConXrefs', 'DisplayOrder');
+ALTER TABLE `ConXrefs` ADD INDEX `DisplayOrder` ( `DisplayOrder` );
 
 -- ObjContext (ObjectID)
 
@@ -98,10 +124,12 @@ ALTER TABLE `ObjContext` ADD INDEX `ObjectID` ( `ObjectID` , `Period` );
 
 -- Objects
 
-CALL sp_DropIndex ('Objects', 'ObjectID');
 ALTER TABLE `Objects` CHANGE `ObjectID` `ObjectID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `Objects` CHANGE `ObjectNumber` `ObjectNumber` VARCHAR( 255 ) NULL DEFAULT NULL;
-ALTER TABLE `Objects` ADD INDEX `ObjectID` ( `ObjectID` , `ObjectNumber` );
+CALL sp_DropIndex ('Objects', 'ObjectID');
+ALTER TABLE `Objects` ADD INDEX `ObjectID` ( `ObjectID` );
+CALL sp_DropIndex ('Objects', 'ObjectNumber');
+ALTER TABLE `Objects` ADD INDEX `ObjectNumber` ( `ObjectNumber` );
 
 -- Constituents
 
@@ -142,7 +170,13 @@ ALTER TABLE `DimItemElemXrefs` CHANGE `TableID` `TableID` VARCHAR( 255 ) NULL DE
 ALTER TABLE `DimItemElemXrefs` CHANGE `ID` `ID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `DimItemElemXrefs` CHANGE `ElementID` `ElementID` VARCHAR( 255 ) NULL DEFAULT NULL;
 CALL sp_DropIndex ('DimItemElemXrefs', 'DimItemElemXrefID');
-ALTER TABLE `DimItemElemXrefs` ADD INDEX `DimItemElemXrefID` ( `DimItemElemXrefID` , `TableID` , `ID` , `ElementID` );
+ALTER TABLE `DimItemElemXrefs` ADD INDEX `DimItemElemXrefID` ( `DimItemElemXrefID` );
+CALL sp_DropIndex ('DimItemElemXrefs', 'TableID');
+ALTER TABLE `DimItemElemXrefs` ADD INDEX `TableID` ( `TableID` );
+CALL sp_DropIndex ('DimItemElemXrefs', 'ID');
+ALTER TABLE `DimItemElemXrefs` ADD INDEX `ID` ( `ID` );
+CALL sp_DropIndex ('DimItemElemXrefs', 'ElementID');
+ALTER TABLE `DimItemElemXrefs` ADD INDEX `ElementID` ( `ElementID` );
 
 -- Roles
 
@@ -153,32 +187,32 @@ ALTER TABLE `Roles` ADD INDEX `RoleID` ( `RoleID` );
 -- Terms
 
 ALTER TABLE `Terms` CHANGE `TermID` `TermID` VARCHAR( 255 ) NULL DEFAULT NULL;
-ALTER TABLE `Terms` CHANGE `TermTypeID` `TermTypeID` VARCHAR( 255 ) NULL DEFAULT NULL;
 CALL sp_DropIndex ('Terms', 'TermID');
-ALTER TABLE `Terms` ADD INDEX `TermID` ( `TermID` , `TermTypeID` );
+ALTER TABLE `Terms` ADD INDEX `TermID` ( `TermID` );
 
 -- ThesXrefs
 
 ALTER TABLE `ThesXrefs` CHANGE `ID` `ID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `ThesXrefs` CHANGE `TermID` `TermID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `ThesXrefs` CHANGE `ThesXrefTypeID` `ThesXrefTypeID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `ThesXrefs` CHANGE `TableID` `TableID` VARCHAR( 255 ) NULL DEFAULT NULL;
 CALL sp_DropIndex ('ThesXrefs', 'ID');
-ALTER TABLE `ThesXrefs` ADD INDEX `ID` ( `ID` , `TermID` , `ThesXrefTypeID` );
-
--- ThesXrefTypes
-
-ALTER TABLE `ThesXrefTypes` CHANGE `ThesXrefTypeID` `ThesXrefTypeID` VARCHAR( 255 ) NULL DEFAULT NULL;
-CALL sp_DropIndex ('ThesXrefTypes', 'ThesXrefTypeID');
-ALTER TABLE `ThesXrefTypes` ADD INDEX `ThesXrefTypeID` ( `ThesXrefTypeID` );
+ALTER TABLE `ThesXrefs` ADD INDEX `ID` ( `ID` );
+CALL sp_DropIndex ('ThesXrefs', 'TermID');
+ALTER TABLE `ThesXrefs` ADD INDEX `TermID` ( `TermID` );
+CALL sp_DropIndex ('ThesXrefs', 'ThesXrefTypeID');
+ALTER TABLE `ThesXrefs` ADD INDEX `ThesXrefTypeID` ( `ThesXrefTypeID` );
+CALL sp_DropIndex ('ThesXrefs', 'TableID');
+ALTER TABLE `ThesXrefs` ADD INDEX `TableID` ( `TableID` );
 
 -- UserFieldXrefs
 
 ALTER TABLE `UserFieldXrefs` CHANGE `UserFieldID` `UserFieldID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `UserFieldXrefs` CHANGE `ID` `ID` VARCHAR( 255 ) NULL DEFAULT NULL;
-ALTER TABLE `UserFieldXrefs` CHANGE `ContextID` `ContextID` VARCHAR( 255 ) NULL DEFAULT NULL;
-ALTER TABLE `UserFieldXrefs` CHANGE `LoginID` `LoginID` VARCHAR( 255 ) NULL DEFAULT NULL;
 CALL sp_DropIndex ('UserFieldXrefs', 'UserFieldID');
-ALTER TABLE `UserFieldXrefs` ADD INDEX `UserFieldID` ( `UserFieldID`, `ID`, `ContextID`, `LoginID` );
+ALTER TABLE `UserFieldXrefs` ADD INDEX `UserFieldID` ( `UserFieldID` );
+CALL sp_DropIndex ('UserFieldXrefs', 'ID');
+ALTER TABLE `UserFieldXrefs` ADD INDEX `ID` ( `ID` );
 
 -- Associations
 
@@ -201,6 +235,12 @@ ALTER TABLE `AltNums` CHANGE `AltNumID` `AltNumID` VARCHAR( 255 ) NULL DEFAULT N
 ALTER TABLE `AltNums` CHANGE `ID` `ID` VARCHAR( 255 ) NULL DEFAULT NULL;
 CALL sp_DropIndex ('AltNums', 'AltNumID');
 ALTER TABLE `AltNums` ADD INDEX `AltNumID` ( `AltNumID` , `ID` );
+
+-- Departments
+
+ALTER TABLE `Departments` CHANGE `DepartmentID` `DepartmentID` VARCHAR( 255 ) NULL DEFAULT NULL;
+CALL sp_DropIndex ('Departments', 'DepartmentID');
+ALTER TABLE `Departments` ADD INDEX `DepartmentID` ( `DepartmentID` );
 
 -- Locations
 
@@ -247,6 +287,15 @@ ALTER TABLE `MediaXrefs` CHANGE `TableID` `TableID` VARCHAR( 255 ) NULL DEFAULT 
 CALL sp_DropIndex ('MediaXrefs', 'MediaXrefID');
 ALTER TABLE `MediaXrefs` ADD INDEX `MediaXrefID` ( `MediaXrefID` , `MediaMasterID`, `ID`, `TableID` );
 
+-- TextEntries
+
+ALTER TABLE `TextEntries` CHANGE `ID` `ID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `TextEntries` CHANGE `TextTypeID` `TextTypeID` VARCHAR( 255 ) NULL DEFAULT NULL;
+CALL sp_DropIndex ('TextEntries', 'ID');
+ALTER TABLE `TextEntries` ADD INDEX `ID` ( `ID` );
+CALL sp_DropIndex ('TextEntries', 'TextTypeID');
+ALTER TABLE `TextEntries` ADD INDEX `TextTypeID` ( `TextTypeID` );
+
 --
 -- VIEWS
 
@@ -286,7 +335,7 @@ SELECT o.ObjectID as _id,
     e.Element as element,
     u.UnitName as unit,
     x.DisplayDimensions as display
-FROM CITvgsrpObjTombstoneD_RO o
+FROM Objects o
 LEFT JOIN
     DimItemElemXrefs x ON x.ID = o.ObjectID
 INNER JOIN
@@ -310,14 +359,12 @@ SELECT o.ObjectID as _id,
     t.Term as object,
     t.TermID
 FROM Terms t, 
-    CITvgsrpObjTombstoneD_RO o,
-    ThesXrefs x,
-    ThesXrefTypes y
+    Objects o,
+    ThesXrefs x
 WHERE
-    x.TermID = t.TermID AND
     x.ID = o.ObjectID AND
-    x.ThesXrefTypeID = y.ThesXrefTypeID AND
-    y.ThesXrefTypeID = 3;
+    x.TermID = t.TermID AND
+    x.ThesXrefTypeID = 3;
 
 -- VIEW Subjects
 
@@ -326,14 +373,12 @@ SELECT o.ObjectID as _id,
     t.Term as subject,
     t.TermID
 FROM Terms t, 
-    CITvgsrpObjTombstoneD_RO o,
-    ThesXrefs x,
-    ThesXrefTypes y
+    Objects o,
+    ThesXrefs x
 WHERE
     x.TermID = t.TermID AND
     x.ID = o.ObjectID AND
-    x.ThesXrefTypeID = y.ThesXrefTypeID AND
-    y.ThesXrefTypeID = 30;
+    x.ThesXrefTypeID = 30;
 
 -- VIEW Materials
 
@@ -342,14 +387,12 @@ SELECT o.ObjectID as _id,
     t.Term as material,
     t.TermID
 FROM Terms t, 
-    CITvgsrpObjTombstoneD_RO o,
-    ThesXrefs x,
-    ThesXrefTypes y
+    Objects o,
+    ThesXrefs x
 WHERE
     x.TermID = t.TermID AND
     x.ID = o.ObjectID AND
-    x.ThesXrefTypeID = y.ThesXrefTypeID AND
-    y.ThesXrefTypeID = 5;
+    x.ThesXrefTypeID = 5;
 
 -- VIEW Techniques
 
@@ -358,14 +401,12 @@ SELECT o.ObjectID as _id,
     t.Term as technique,
     t.TermID
 FROM Terms t,
-    CITvgsrpObjTombstoneD_RO o,
-    ThesXrefs x,
-    ThesXrefTypes y
+    Objects o,
+    ThesXrefs x
 WHERE
     x.TermID = t.TermID AND
     x.ID = o.ObjectID AND
-    x.ThesXrefTypeID = y.ThesXrefTypeID AND
-    y.ThesXrefTypeID = 6;
+    x.ThesXrefTypeID = 6;
 
 -- VIEW Data PIDS
 
@@ -375,7 +416,7 @@ SELECT o.ObjectNumber as _id,
     ref.fieldValue as dataPid
 FROM UserFieldXrefs ref
 INNER JOIN 
-    CITvgsrpObjTombstoneD_RO o ON o.ObjectID = ref.ID
+    Objects o ON o.ObjectID = ref.ID
 WHERE userFieldID = '44';
 
 -- VIEW Work PIDS
@@ -386,7 +427,7 @@ SELECT o.ObjectNumber as _id,
     ref.fieldValue as workPid
 FROM UserFieldXrefs ref
 INNER JOIN 
-    CITvgsrpObjTombstoneD_RO o ON o.ObjectID = ref.ID
+    Objects o ON o.ObjectID = ref.ID
 WHERE userFieldID = '46';
 
 -- VIEW Representation PIDS
@@ -397,7 +438,7 @@ SELECT o.ObjectNumber as _id,
     ref.fieldValue as representationPid
 FROM UserFieldXrefs ref
 INNER JOIN 
-    CITvgsrpObjTombstoneD_RO o ON o.ObjectID = ref.ID
+    Objects o ON o.ObjectID = ref.ID
 WHERE userFieldID = '48';
 
 -- VIEW ObjTitles
@@ -461,10 +502,7 @@ INNER JOIN
 CREATE OR REPLACE VIEW vdescriptions AS
 SELECT o.ObjectID as _id,
     d.Chat as description
-FROM CITvgsrpObjTombstoneD_RO o,
-    Objects d
-WHERE
-    d.ObjectID = o.ObjectID;
+FROM Objects o;
 
 -- VIEW Departments
 
@@ -472,7 +510,7 @@ CREATE OR REPLACE VIEW vdepartments AS
 SELECT o.ObjectID as _id,
     d.DepartmentID,
     d.Department as department
-FROM CITvgsrpObjTombstoneD_RO o,
+FROM Objects o,
     Departments d
 WHERE
     o.DepartmentID = d.DepartmentID;
@@ -481,11 +519,8 @@ WHERE
 
 CREATE OR REPLACE VIEW viconclass AS
 SELECT o.ObjectID as _id,
-    obj.Notes as iconclass
-FROM CITvgsrpObjTombstoneD_RO o,
-    Objects obj
-WHERE
-    obj.ObjectID = o.ObjectID;
+    o.Notes as iconclass
+FROM Objects o;
 
 -- VIEW Relations
 
@@ -498,12 +533,12 @@ SELECT DISTINCT o.ObjectID as _id,
     NULL as relationshipID2,
     n.AltNum as numbering,
     n.Description as descriptionNumbering
-FROM CITvgsrpObjTombstoneD_RO o,
+FROM Objects o,
     Associations a
 INNER JOIN
     Relationships r ON r.RelationshipID = a.RelationshipID
 INNER JOIN
-    CITvgsrpObjTombstoneD_RO obj ON obj.ObjectID = a.ID2
+    Objects obj ON obj.ObjectID = a.ID2
 LEFT JOIN
     AltNums n ON n.ID = a.ID2 AND n.Description = 'paginanummer'
 WHERE
@@ -518,12 +553,12 @@ SELECT DISTINCT o.ObjectID as _id,
     r.RelationshipID as relationshipID2,
     n.AltNum as numbering,
     n.Description as descriptionNumbering
-FROM CITvgsrpObjTombstoneD_RO o,
+FROM Objects o,
     Associations a
 INNER JOIN
     Relationships r ON r.RelationshipID = a.RelationshipID
 INNER JOIN
-    CITvgsrpObjTombstoneD_RO obj ON obj.ObjectID = a.ID1
+    Objects obj ON obj.ObjectID = a.ID1
 LEFT JOIN
     AltNums n ON n.ID = a.ID1 AND n.Description = 'paginanummer'
 WHERE
@@ -535,7 +570,7 @@ WHERE
 CREATE OR REPLACE VIEW vpagenumbers AS
 SELECT o.ObjectID as _id,
     a.AltNum as pageNumber
-FROM CITvgsrpObjTombstoneD_RO o,
+FROM Objects o,
     AltNums a
 WHERE o.ObjectID = a.ID AND a.Description = 'paginanummer';
 
