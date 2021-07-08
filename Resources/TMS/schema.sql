@@ -75,8 +75,10 @@ ALTER TABLE `ConXrefDetails` CHANGE `ConXrefDetailID` `ConXrefDetailID` VARCHAR(
 ALTER TABLE `ConXrefDetails` CHANGE `ConXrefID` `ConXrefID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `ConXrefDetails` CHANGE `RoleTypeID` `RoleTypeID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `ConXrefDetails` CHANGE `ConstituentID` `ConstituentID` VARCHAR( 255 ) NULL DEFAULT NULL;
-CALL sp_DropIndex ('ConXrefDetails', 'ConXrefDetailID');
-ALTER TABLE `ConXrefDetails` ADD INDEX `ConXrefDetailID` ( `ConXrefDetailID`, `ConXrefID`, `RoleTypeID`, `ConstituentID` );
+CALL sp_DropIndex ('ConXrefDetails', 'ConXrefID');
+ALTER TABLE `ConXrefDetails` ADD INDEX `ConXrefID` (`ConXrefID` );
+CALL sp_DropIndex ('ConXrefDetails', 'ConstituentID');
+ALTER TABLE `ConXrefDetails` ADD INDEX `ConstituentID` ( `ConstituentID` );
 
 -- ConXrefs
 
@@ -100,6 +102,12 @@ CALL sp_DropIndex ('Objects', 'ObjectID');
 ALTER TABLE `Objects` CHANGE `ObjectID` `ObjectID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `Objects` CHANGE `ObjectNumber` `ObjectNumber` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `Objects` ADD INDEX `ObjectID` ( `ObjectID` , `ObjectNumber` );
+
+-- Constituents
+
+ALTER TABLE `Constituents` CHANGE `ConstituentID` `ConstituentID` VARCHAR( 255 ) NULL DEFAULT NULL;
+CALL sp_DropIndex ('Constituents', 'ConstituentID');
+ALTER TABLE `Constituents` ADD INDEX `ConstituentID` ( `ConstituentID` );
 
 -- Dimensions
 
@@ -135,6 +143,12 @@ ALTER TABLE `DimItemElemXrefs` CHANGE `ID` `ID` VARCHAR( 255 ) NULL DEFAULT NULL
 ALTER TABLE `DimItemElemXrefs` CHANGE `ElementID` `ElementID` VARCHAR( 255 ) NULL DEFAULT NULL;
 CALL sp_DropIndex ('DimItemElemXrefs', 'DimItemElemXrefID');
 ALTER TABLE `DimItemElemXrefs` ADD INDEX `DimItemElemXrefID` ( `DimItemElemXrefID` , `TableID` , `ID` , `ElementID` );
+
+-- Roles
+
+ALTER TABLE `Roles` CHANGE `RoleID` `RoleID` VARCHAR( 255 ) NULL DEFAULT NULL;
+CALL sp_DropIndex ('Roles', 'RoleID');
+ALTER TABLE `Roles` ADD INDEX `RoleID` ( `RoleID` );
 
 -- Terms
 
