@@ -209,13 +209,39 @@ ALTER TABLE `ObjComponents` CHANGE `ObjectID` `ObjectID` VARCHAR( 255 ) NULL DEF
 CALL sp_DropIndex ('ObjComponents', 'ComponentID');
 ALTER TABLE `ObjComponents` ADD INDEX `ComponentID` ( `ComponentID` , `CurrentObjLocID` , `ObjectID` );
 
+-- MediaFiles
+
+ALTER TABLE `MediaFiles` CHANGE `FileID` `FileID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `MediaFiles` CHANGE `RenditionID` `RenditionID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `MediaFiles` CHANGE `PathID` `PathID` VARCHAR( 255 ) NULL DEFAULT NULL;
+CALL sp_DropIndex ('MediaFiles', 'FileID');
+ALTER TABLE `MediaFiles` ADD INDEX `FileID` ( `FileID` , `RenditionID` , `PathID` );
+
+-- MediaRenditions
+
+ALTER TABLE `MediaRenditions` CHANGE `RenditionID` `RenditionID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `MediaRenditions` CHANGE `MediaMasterID` `MediaMasterID` VARCHAR( 255 ) NULL DEFAULT NULL;
+CALL sp_DropIndex ('MediaRenditions', 'RenditionID');
+ALTER TABLE `MediaRenditions` ADD INDEX `RenditionID` ( `RenditionID` , `MediaMasterID` );
+
+-- MediaXrefs
+
+ALTER TABLE `MediaXrefs` CHANGE `MediaXrefID` `MediaXrefID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `MediaXrefs` CHANGE `MediaMasterID` `MediaMasterID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `MediaXrefs` CHANGE `ID` `ID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `MediaXrefs` CHANGE `TableID` `TableID` VARCHAR( 255 ) NULL DEFAULT NULL;
+CALL sp_DropIndex ('MediaXrefs', 'MediaXrefID');
+ALTER TABLE `MediaXrefs` ADD INDEX `MediaXrefID` ( `MediaXrefID` , `MediaMasterID`, `ID`, `TableID` );
+
 --
 -- VIEWS
 
 -- VIEW Constituents 
 
 CREATE OR REPLACE VIEW vconstituents AS
-SELECT o.ObjectID as _id, o.ObjectNumber, c.ConstituentID, c.AlphaSort, c.DisplayName, c.BeginDate, c.EndDate, c.BeginDateISO, c.EndDateISO, r.Role, cr.DisplayOrder, te.TextEntry as copyright FROM Objects o
+SELECT o.ObjectID as _id, o.ObjectNumber, c.ConstituentID, c.AlphaSort, c.DisplayName, c.BeginDate, c.EndDate, c.BeginDateISO, c.EndDateISO, r.Role, cr.DisplayOrder,
+    IF(te.TextEntry <> 'CC0', CONCAT(te.TextEntry, ', ', YEAR(NOW())), te.TextEntry) as copyright
+FROM Objects o
    INNER JOIN ConXrefs cr ON cr.ID = o.ObjectID AND cr.TableID = 108 AND cr.RoleTypeID = 1
    INNER JOIN (SELECT DISTINCT ConXrefID, ConstituentID FROM ConXrefDetails) cd ON cd.ConXRefID = cr.ConXrefID
    LEFT JOIN Roles r ON r.RoleID = cr.RoleID
@@ -258,7 +284,10 @@ INNER JOIN
 INNER JOIN
     DimensionElements e ON e.ElementID = x.ElementID
 WHERE
-    x.TableID = '108';
+    x.TableID = '108'
+ORDER BY
+    e.Element = 'Dagmaat' DESC,
+    e.Element = 'Volledig' DESC;
 
 -- VIEW Objects
 
@@ -363,7 +392,7 @@ CREATE OR REPLACE VIEW vobjtitles AS
 SELECT obj.ObjectNumber as _id, 
     tit.titleID as titleid,
     tit.Title as title,
-    tit.LanguageID as languageid,
+    l.ISO369v1Code as language,
     tit.TitleTypeID as titletypeid,
     tit.Displayed as displayed,
     tit.Active as active
@@ -409,7 +438,9 @@ LEFT JOIN
             AND ObjTitles.LanguageID = lowest.LanguageID
             AND ObjTitles.TitleTypeID = lowest.TitleTypeID
             AND ObjTitles.DisplayOrder = lowest.displayorder
-    ) AS tit ON tit.ObjectID = obj.ObjectID;
+    ) AS tit ON tit.ObjectID = obj.ObjectID
+INNER JOIN
+    DDLanguages l ON l.LanguageID = tit.LanguageID AND l.ISO369v1Code <> '';
 
 -- VIEW Descriptions
 
@@ -498,9 +529,9 @@ WHERE o.ObjectID = a.ID AND a.Description = 'paginanummer';
 
 CREATE OR REPLACE VIEW vinscriptions AS
 SELECT ObjectID as _id,
-    o.ObjectNumber as objectNumber,
-    o.Inscribed as inscription
-FROM Objects o;
+    ObjectNumber as objectNumber,
+    Inscribed as inscription
+FROM Objects;
 
 -- VIEW Locations
 
@@ -516,3 +547,128 @@ INNER JOIN
     Objects o ON oc.ObjectID = o.ObjectID
 WHERE
     l.Site = 'publieksruimte';
+
+-- VIEW TextEntries
+
+CREATE OR REPLACE VIEW vtextentries AS
+SELECT o.ObjectID as _id,
+    REPLACE(t.TextEntry, '\r', '') as textEntry,
+    t.LanguageID as languageid,
+    t.TextTypeID as textTypeID
+FROM TextEntries t
+INNER JOIN
+    Objects o ON t.ID = o.ObjectID
+WHERE
+    t.Purpose = 'Update Collectie-Informatie' AND t.TextTypeID IN(107, 110, 113, 117) AND t.TextStatusID = 8;
+
+-- VIEW Clusters
+
+CREATE OR REPLACE VIEW vclusters AS
+SELECT o.ObjectID as _id,
+    u.FieldValue as cluster
+FROM UserFieldXrefs u
+INNER JOIN
+    Objects o ON u.ID = o.ObjectID
+Where
+    u.UserFieldID = 108;
+
+-- VIEW Halls
+
+CREATE OR REPLACE VIEW vhalls AS
+SELECT o.ObjectID as _id,
+    u.FieldValue as hall
+FROM UserFieldXrefs u
+INNER JOIN
+    Objects o ON u.ID = o.ObjectID
+Where
+    u.UserFieldID = 107;
+
+-- VIEW Provenance
+
+CREATE OR REPLACE VIEW vprovenance AS
+SELECT ObjectID as _id,
+    ObjectNumber as objectNumber,
+    REPLACE(Provenance, '\r', '') as provenance
+FROM Objects;
+
+-- VIEW AAT
+
+CREATE OR REPLACE VIEW vaat AS
+SELECT o.ObjectID as _id,
+    o.ObjectNumber as objectNumber,
+    t.Term as term
+FROM ThesXrefs tx
+INNER JOIN
+    Terms t ON tx.TermID = t.TermID
+INNER JOIN
+    Objects o ON tx.ID = o.ObjectID
+WHERE
+    tx.TableID = '108' AND tx.ThesXrefTypeID = '39';
+
+-- VIEW LinkLibrary
+
+CREATE OR REPLACE VIEW vlinklibrary AS
+SELECT ObjectID as _id,
+    ObjectNumber as objectNumber,
+    UserNumber1 as link
+FROM Objects
+WHERE
+    UserNumber1 <> '';
+
+-- VIEW LinkArchive
+
+CREATE OR REPLACE VIEW vlinkarchive AS
+SELECT o.ObjectID as _id,
+    o.ObjectNumber as objectNumber,
+    mf.FileName as link
+FROM MediaXrefs m
+INNER JOIN
+    Objects o ON m.ID = o.ObjectID
+INNER JOIN
+    MediaRenditions mr ON m.MediaMasterID = mr.MediaMasterID
+INNER JOIN
+    MediaFiles mf ON mr.RenditionID = mf.RenditionID
+WHERE
+    m.TableID = '108' AND mf.PathID = 23;
+
+-- VIEW Restoration
+
+CREATE OR REPLACE VIEW vrestoration AS
+SELECT ObjectID as _id,
+    ObjectNumber as objectNumber,
+    CreditLine as creditLine
+FROM Objects;
+
+-- VIEW Acquisition
+
+CREATE OR REPLACE VIEW vacquisition AS
+SELECT o.ObjectID as _id,
+    o.ObjectNumber as objectNumber,
+    r.Role as role,
+    con.DisplayName AS name,
+    con.ConstituentID AS constituentID,
+    cd.DisplayDate as date
+FROM
+    Objects o
+INNER JOIN
+    ConXrefs c ON o.ObjectID = c.ID
+INNER JOIN
+    Roles r ON r.RoleID = c.RoleID
+INNER JOIN
+    ConXrefDetails cd ON cd.ConXrefID = c.ConXrefID
+LEFT OUTER JOIN
+    Constituents con ON cd.ConstituentID = con.ConstituentID
+WHERE
+    c.RoleTypeID = 2 AND c.TableID = 108 AND c.Displayed = 1 AND cd.UnMasked = 1 AND r.Role IS NOT NULL AND con.DisplayName IS NOT NULL;
+
+-- VIEW ObjectNames
+
+CREATE OR REPLACE VIEW vobjectnames AS
+SELECT o.ObjectID as _id,
+    o.ObjectNumber as objectNumber,
+    n.ObjectName as objectName,
+    n.ObjectNameID as objectNameID,
+    n.ObjectNameTypeID as objectNameTypeID
+FROM ObjectNames n
+INNER JOIN
+    Objects o ON n.ObjectID = o.ObjectID;

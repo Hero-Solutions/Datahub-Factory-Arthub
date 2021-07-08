@@ -73,6 +73,26 @@ sub prepare {
     $self->__inscriptions();
     $self->logger->info('Adding "locations" temporary table.');
     $self->__locations();
+    $self->logger->info('Adding "textentries" temporary table.');
+    $self->__textentries();
+    $self->logger->info('Adding "clusters" temporary table.');
+    $self->__clusters();
+    $self->logger->info('Adding "halls" temporary table.');
+    $self->__halls();
+    $self->logger->info('Adding "provenance" temporary table.');
+    $self->__provenance();
+    $self->logger->info('Adding "aat" temporary table.');
+    $self->__aat();
+    $self->logger->info('Adding "linklibrary" temporary table.');
+    $self->__linklibrary();
+    $self->logger->info('Adding "linkarchive" temporary table.');
+    $self->__linkarchive();
+    $self->logger->info('Adding "restoration" temporary table.');
+    $self->__restoration();
+    $self->logger->info('Adding "acquisition" temporary table.');
+    $self->__acquisition();
+    $self->logger->info('Adding "objectnames" temporary table.');
+    $self->__objectnames();
 }
 
 sub prepare_call {
@@ -218,12 +238,62 @@ sub __pagenumbers {
 
 sub __inscriptions {
     my $self = shift;
-    $self->merge_call('SELECT * FROM vinscriptions', 'inscriptions', 'inscriptions');
+    $self->prepare_call('SELECT * FROM vinscriptions', 'inscriptions');
 }
 
 sub __locations {
     my $self = shift;
     $self->prepare_call('SELECT * FROM vlocations', 'locations');
+}
+
+sub __textentries {
+    my $self = shift;
+    $self->merge_call('SELECT * FROM vtextentries', 'textentries', 'textentries');
+}
+
+sub __clusters {
+    my $self = shift;
+    $self->merge_call('SELECT * FROM vclusters', 'clusters', 'clusters');
+}
+
+sub __halls {
+    my $self = shift;
+    $self->merge_call('SELECT * FROM vhalls', 'halls', 'halls');
+}
+
+sub __provenance {
+    my $self = shift;
+    $self->prepare_call('SELECT * FROM vprovenance', 'provenance');
+}
+
+sub __aat {
+    my $self = shift;
+    $self->merge_call('SELECT * FROM vaat', 'aat', 'aat');
+}
+
+sub __linklibrary {
+    my $self = shift;
+    $self->prepare_call('SELECT * FROM vlinklibrary', 'linklibrary');
+}
+
+sub __linkarchive {
+    my $self = shift;
+    $self->merge_call('SELECT * FROM vlinkarchive', 'linkarchive', 'linkarchive');
+}
+
+sub __restoration {
+    my $self = shift;
+    $self->prepare_call('SELECT * FROM vrestoration', 'restoration');
+}
+
+sub __acquisition {
+    my $self = shift;
+    $self->merge_call('SELECT * FROM vacquisition', 'acquisition', 'acquisition');
+}
+
+sub __objectnames {
+    my $self = shift;
+    $self->merge_call('SELECT * FROM vobjectnames', 'objectnames', 'objectnames');
 }
 
 1;
