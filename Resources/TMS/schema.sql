@@ -501,7 +501,7 @@ INNER JOIN
 
 CREATE OR REPLACE VIEW vdescriptions AS
 SELECT o.ObjectID as _id,
-    d.Chat as description
+    o.Chat as description
 FROM Objects o;
 
 -- VIEW Departments
