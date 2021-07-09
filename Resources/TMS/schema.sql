@@ -296,6 +296,13 @@ ALTER TABLE `TextEntries` ADD INDEX `ID` ( `ID` );
 CALL sp_DropIndex ('TextEntries', 'TextTypeID');
 ALTER TABLE `TextEntries` ADD INDEX `TextTypeID` ( `TextTypeID` );
 
+-- ClassificationNotations
+
+ALTER TABLE `ClassificationNotations` CHANGE `ClassificationNotationID` `ClassificationNotationID` VARCHAR( 255 ) NULL DEFAULT NULL;
+ALTER TABLE `ClassificationNotations` CHANGE `TermMasterID` `TermMasterID` VARCHAR( 255 ) NULL DEFAULT NULL;
+CALL sp_DropIndex ('ClassificationNotations', 'ClassificationNotationID');
+ALTER TABLE `ClassificationNotations` ADD INDEX `ClassificationNotationID` ( `ClassificationNotationID` , `TermMasterID` );
+
 --
 -- VIEWS
 
@@ -317,7 +324,8 @@ ORDER BY cr.DisplayOrder;
 CREATE OR REPLACE VIEW vclassifications AS
 SELECT o.ObjectID as _id, o.ObjectNumber, c.ClassificationID, c.Classification FROM Objects o
   INNER JOIN ClassificationXRefs cr ON o.ObjectID = cr.ID
-  INNER JOIN Classifications c ON c.ClassificationID = cr.ClassificationID;
+  INNER JOIN Classifications c ON c.ClassificationID = cr.ClassificationID
+ORDER BY cr.DisplayOrder;
 
 -- VIEW Periods
 
@@ -378,7 +386,8 @@ FROM Terms t,
 WHERE
     x.TermID = t.TermID AND
     x.ID = o.ObjectID AND
-    x.ThesXrefTypeID = 30;
+    x.ThesXrefTypeID = 30
+ORDER BY x.DisplayOrder;
 
 -- VIEW Materials
 
@@ -392,7 +401,8 @@ FROM Terms t,
 WHERE
     x.TermID = t.TermID AND
     x.ID = o.ObjectID AND
-    x.ThesXrefTypeID = 5;
+    x.ThesXrefTypeID = 5
+ORDER BY x.DisplayOrder;
 
 -- VIEW Techniques
 
@@ -406,7 +416,8 @@ FROM Terms t,
 WHERE
     x.TermID = t.TermID AND
     x.ID = o.ObjectID AND
-    x.ThesXrefTypeID = 6;
+    x.ThesXrefTypeID = 6
+ORDER BY x.DisplayOrder;
 
 -- VIEW Data PIDS
 
@@ -461,7 +472,8 @@ LEFT JOIN
             ObjTitles.LanguageID,
             ObjTitles.TitleTypeID,
             ObjTitles.Displayed,
-            ObjTitles.Active
+            ObjTitles.Active,
+            ObjTitles.DisplayOrder
         FROM
             (
                 SELECT ObjTitles.ObjectID,
@@ -495,14 +507,8 @@ LEFT JOIN
             AND ObjTitles.DisplayOrder = lowest.displayorder
     ) AS tit ON tit.ObjectID = obj.ObjectID
 INNER JOIN
-    DDLanguages l ON l.LanguageID = tit.LanguageID AND l.ISO369v1Code <> '';
-
--- VIEW Descriptions
-
-CREATE OR REPLACE VIEW vdescriptions AS
-SELECT o.ObjectID as _id,
-    o.Chat as description
-FROM Objects o;
+    DDLanguages l ON l.LanguageID = tit.LanguageID AND l.ISO369v1Code <> ''
+ORDER BY tit.DisplayOrder;
 
 -- VIEW Departments
 
@@ -514,13 +520,6 @@ FROM Objects o,
     Departments d
 WHERE
     o.DepartmentID = d.DepartmentID;
-
--- VIEW Iconclass
-
-CREATE OR REPLACE VIEW viconclass AS
-SELECT o.ObjectID as _id,
-    o.Notes as iconclass
-FROM Objects o;
 
 -- VIEW Relations
 
@@ -574,14 +573,6 @@ FROM Objects o,
     AltNums a
 WHERE o.ObjectID = a.ID AND a.Description = 'paginanummer';
 
--- VIEW Inscriptions
-
-CREATE OR REPLACE VIEW vinscriptions AS
-SELECT ObjectID as _id,
-    ObjectNumber as objectNumber,
-    Inscribed as inscription
-FROM Objects;
-
 -- VIEW Locations
 
 CREATE OR REPLACE VIEW vlocations AS
@@ -612,25 +603,25 @@ WHERE
 
 -- VIEW Clusters
 
-CREATE OR REPLACE VIEW vclusters AS
-SELECT o.ObjectID as _id,
-    u.FieldValue as cluster
-FROM UserFieldXrefs u
-INNER JOIN
-    Objects o ON u.ID = o.ObjectID
-Where
-    u.UserFieldID = 108;
+-- CREATE OR REPLACE VIEW vclusters AS
+-- SELECT o.ObjectID as _id,
+--     u.FieldValue as cluster
+-- FROM UserFieldXrefs u
+-- INNER JOIN
+--     Objects o ON u.ID = o.ObjectID
+-- Where
+--     u.UserFieldID = 108;
 
 -- VIEW Halls
 
-CREATE OR REPLACE VIEW vhalls AS
-SELECT o.ObjectID as _id,
-    u.FieldValue as hall
-FROM UserFieldXrefs u
-INNER JOIN
-    Objects o ON u.ID = o.ObjectID
-Where
-    u.UserFieldID = 107;
+-- CREATE OR REPLACE VIEW vhalls AS
+-- SELECT o.ObjectID as _id,
+--     u.FieldValue as hall
+-- FROM UserFieldXrefs u
+-- INNER JOIN
+--     Objects o ON u.ID = o.ObjectID
+-- Where
+--     u.UserFieldID = 107;
 
 -- VIEW Provenance
 
@@ -645,14 +636,18 @@ FROM Objects;
 CREATE OR REPLACE VIEW vaat AS
 SELECT o.ObjectID as _id,
     o.ObjectNumber as objectNumber,
-    t.Term as term
+    t.Term as term,
+    c.CN as path
 FROM ThesXrefs tx
 INNER JOIN
     Terms t ON tx.TermID = t.TermID
 INNER JOIN
     Objects o ON tx.ID = o.ObjectID
+INNER JOIN
+    ClassificationNotations c on t.TermMasterID = c.TermMasterID
 WHERE
-    tx.TableID = '108' AND tx.ThesXrefTypeID = '39';
+    tx.TableID = '108' AND tx.ThesXrefTypeID = '39'
+ORDER BY tx.DisplayOrder;
 
 -- VIEW LinkLibrary
 
@@ -678,15 +673,8 @@ INNER JOIN
 INNER JOIN
     MediaFiles mf ON mr.RenditionID = mf.RenditionID
 WHERE
-    m.TableID = '108' AND mf.PathID = 23;
-
--- VIEW Restoration
-
-CREATE OR REPLACE VIEW vrestoration AS
-SELECT ObjectID as _id,
-    ObjectNumber as objectNumber,
-    CreditLine as creditLine
-FROM Objects;
+    m.TableID = '108' AND mf.PathID = 23
+ORDER BY m.DisplayOrder;
 
 -- VIEW Acquisition
 
@@ -708,7 +696,9 @@ INNER JOIN
 LEFT OUTER JOIN
     Constituents con ON cd.ConstituentID = con.ConstituentID
 WHERE
-    c.RoleTypeID = 2 AND c.TableID = 108 AND c.Displayed = 1 AND cd.UnMasked = 1 AND r.Role IS NOT NULL AND con.DisplayName IS NOT NULL;
+    c.RoleTypeID = 2 AND c.TableID = 108 AND c.Displayed = 1 AND cd.UnMasked = 1 AND r.Role IS NOT NULL AND con.DisplayName IS NOT NULL
+ORDER BY
+    c.DisplayOrder;
 
 -- VIEW ObjectNames
 
@@ -720,4 +710,5 @@ SELECT o.ObjectID as _id,
     n.ObjectNameTypeID as objectNameTypeID
 FROM ObjectNames n
 INNER JOIN
-    Objects o ON n.ObjectID = o.ObjectID;
+    Objects o ON n.ObjectID = o.ObjectID
+ORDER BY n.DisplayOrder;

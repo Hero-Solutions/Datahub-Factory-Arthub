@@ -59,26 +59,20 @@ sub prepare {
     $self->__workpids();
     $self->logger->info('Adding "objtitles" temporary table.');
     $self->__objtitles();
-    $self->logger->info('Adding "descriptions" temporary table.');
-    $self->__descriptions();
     $self->logger->info('Adding "departments" temporary table.');
     $self->__departments();
-    $self->logger->info('Adding "iconclass" temporary table.');
-    $self->__iconclass();
     $self->logger->info('Adding "relations" temporary table.');
     $self->__relations();
     $self->logger->info('Adding "pagenumbers" temporary table.');
     $self->__pagenumbers();
-    $self->logger->info('Adding "inscriptions" temporary table.');
-    $self->__inscriptions();
     $self->logger->info('Adding "locations" temporary table.');
     $self->__locations();
     $self->logger->info('Adding "textentries" temporary table.');
     $self->__textentries();
-    $self->logger->info('Adding "clusters" temporary table.');
-    $self->__clusters();
-    $self->logger->info('Adding "halls" temporary table.');
-    $self->__halls();
+#     $self->logger->info('Adding "clusters" temporary table.');
+#     $self->__clusters();
+#     $self->logger->info('Adding "halls" temporary table.');
+#     $self->__halls();
     $self->logger->info('Adding "provenance" temporary table.');
     $self->__provenance();
     $self->logger->info('Adding "aat" temporary table.');
@@ -87,8 +81,6 @@ sub prepare {
     $self->__linklibrary();
     $self->logger->info('Adding "linkarchive" temporary table.');
     $self->__linkarchive();
-    $self->logger->info('Adding "restoration" temporary table.');
-    $self->__restoration();
     $self->logger->info('Adding "acquisition" temporary table.');
     $self->__acquisition();
     $self->logger->info('Adding "objectnames" temporary table.');
@@ -211,19 +203,9 @@ sub __objtitles {
     $self->merge_call('SELECT * FROM vobjtitles', 'objtitles', 'objtitles');
 }
 
-sub __descriptions {
-    my $self = shift;
-    $self->prepare_call('SELECT * FROM vdescriptions', 'descriptions');
-}
-
 sub __departments {
     my $self = shift;
     $self->prepare_call('SELECT * FROM vdepartments', 'departments');
-}
-
-sub __iconclass {
-    my $self = shift;
-    $self->prepare_call('SELECT * FROM viconclass', 'iconclass');
 }
 
 sub __relations {
@@ -234,11 +216,6 @@ sub __relations {
 sub __pagenumbers {
     my $self = shift;
     $self->prepare_call('SELECT * FROM vpagenumbers', 'pagenumbers');
-}
-
-sub __inscriptions {
-    my $self = shift;
-    $self->prepare_call('SELECT * FROM vinscriptions', 'inscriptions');
 }
 
 sub __locations {
@@ -279,11 +256,6 @@ sub __linklibrary {
 sub __linkarchive {
     my $self = shift;
     $self->merge_call('SELECT * FROM vlinkarchive', 'linkarchive', 'linkarchive');
-}
-
-sub __restoration {
-    my $self = shift;
-    $self->prepare_call('SELECT * FROM vrestoration', 'restoration');
 }
 
 sub __acquisition {
