@@ -39,6 +39,41 @@ BEGIN
 
 END $$
 
+DROP FUNCTION IF EXISTS `uf_get_first_digits`$$
+
+CREATE FUNCTION `uf_get_first_digits`(as_val VARCHAR(65535))
+RETURNS VARCHAR(65535)
+DETERMINISTIC
+BEGIN
+
+    DECLARE retval VARCHAR(65535);
+    DECLARE i INT;
+    DECLARE strlen INT;
+    -- shortcut exit for special cases
+    IF as_val IS NULL OR as_val = '' THEN
+        RETURN as_val;
+    END IF;
+    -- initialize for loop
+    SET retval = '';
+    SET i = 1;
+    SET strlen = CHAR_LENGTH(as_val);
+    do_loop:
+        LOOP
+            IF i > strlen THEN
+            LEAVE do_loop;
+        END IF;
+        IF SUBSTR(as_val,i,1) IN ('0','1','2','3','4','5','6','7','8','9') THEN
+            SET retval = CONCAT(retval,SUBSTR(as_val,i,1));
+        ELSE
+            LEAVE do_loop;
+        END IF;
+        SET i = i + 1;
+        END LOOP do_loop;
+
+    RETURN retval;
+
+END$$
+
 DELIMITER ;
 
 -- ObjTitles
@@ -298,10 +333,9 @@ ALTER TABLE `TextEntries` ADD INDEX `TextTypeID` ( `TextTypeID` );
 
 -- ClassificationNotations
 
-ALTER TABLE `ClassificationNotations` CHANGE `ClassificationNotationID` `ClassificationNotationID` VARCHAR( 255 ) NULL DEFAULT NULL;
 ALTER TABLE `ClassificationNotations` CHANGE `TermMasterID` `TermMasterID` VARCHAR( 255 ) NULL DEFAULT NULL;
-CALL sp_DropIndex ('ClassificationNotations', 'ClassificationNotationID');
-ALTER TABLE `ClassificationNotations` ADD INDEX `ClassificationNotationID` ( `ClassificationNotationID` , `TermMasterID` );
+CALL sp_DropIndex ('ClassificationNotations', 'TermMasterID');
+ALTER TABLE `ClassificationNotations` ADD INDEX `TermMasterID` ( `TermMasterID` );
 
 --
 -- VIEWS
@@ -363,60 +397,69 @@ ORDER BY
 -- VIEW Objects
 
 CREATE OR REPLACE VIEW vobjects AS
-SELECT o.ObjectID as _id,
+SELECT DISTINCT o.ObjectID as _id,
     t.Term as object,
-    t.TermID
+    t.TermID,
+    x.DisplayOrder
 FROM Terms t, 
     Objects o,
     ThesXrefs x
 WHERE
     x.ID = o.ObjectID AND
     x.TermID = t.TermID AND
-    x.ThesXrefTypeID = 3;
+    x.ThesXrefTypeID = 3 AND
+    x.DisplayOrder = (SELECT MIN(DisplayOrder) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.TermID = t.TermID AND r.ThesXrefTypeID = 3)
+ORDER BY x.DisplayOrder;
 
 -- VIEW Subjects
 
 CREATE OR REPLACE VIEW vsubjects AS
-SELECT o.ObjectID as _id,
+SELECT DISTINCT o.ObjectID as _id,
     t.Term as subject,
-    t.TermID
+    t.TermID,
+    x.DisplayOrder
 FROM Terms t, 
     Objects o,
     ThesXrefs x
 WHERE
     x.TermID = t.TermID AND
     x.ID = o.ObjectID AND
-    x.ThesXrefTypeID = 30
+    x.ThesXrefTypeID = 30 AND
+    x.DisplayOrder = (SELECT MIN(DisplayOrder) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.TermID = t.TermID AND r.ThesXrefTypeID = 30)
 ORDER BY x.DisplayOrder;
 
 -- VIEW Materials
 
 CREATE OR REPLACE VIEW vmaterials AS
-SELECT o.ObjectID as _id,
+SELECT DISTINCT o.ObjectID as _id,
     t.Term as material,
-    t.TermID
+    t.TermID,
+    x.DisplayOrder
 FROM Terms t, 
     Objects o,
     ThesXrefs x
 WHERE
     x.TermID = t.TermID AND
     x.ID = o.ObjectID AND
-    x.ThesXrefTypeID = 5
+    x.ThesXrefTypeID = 5 AND
+    x.DisplayOrder = (SELECT MIN(DisplayOrder) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.TermID = t.TermID AND r.ThesXrefTypeID = 5)
 ORDER BY x.DisplayOrder;
 
 -- VIEW Techniques
 
 CREATE OR REPLACE VIEW vtechniques AS
-SELECT o.ObjectID as _id,
+SELECT DISTINCT o.ObjectID as _id,
     t.Term as technique,
-    t.TermID
+    t.TermID,
+    x.DisplayOrder
 FROM Terms t,
     Objects o,
     ThesXrefs x
 WHERE
     x.TermID = t.TermID AND
     x.ID = o.ObjectID AND
-    x.ThesXrefTypeID = 6
+    x.ThesXrefTypeID = 6 AND
+    x.DisplayOrder = (SELECT MIN(DisplayOrder) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.TermID = t.TermID AND r.ThesXrefTypeID = 6)
 ORDER BY x.DisplayOrder;
 
 -- VIEW Data PIDS
@@ -524,45 +567,68 @@ WHERE
 -- VIEW Relations
 
 CREATE OR REPLACE VIEW vrelations AS
+SELECT *,
+IF(beforeSlash LIKE '%-%', SUBSTRING(beforeSlash, 1, INSTR(beforeSlash, '-') - 1), beforeSlash) AS first,
+IF(beforeSlash LIKE '%-%', SUBSTRING(beforeSlash, INSTR(beforeSlash, '-') + 1), 999999999) AS second,
+IF(afterSlash LIKE '%-%', SUBSTRING(afterSlash, 1, INSTR(afterSlash, '-') - 1), afterSlash) AS third,
+IF(afterSlash LIKE '%-%', SUBSTRING(afterSlash, INSTR(afterSlash, '-') + 1), 999999999) AS fourth
+FROM
 (
-SELECT DISTINCT o.ObjectID as _id,
-    obj.ObjectNumber as relatedObjectNumber,
-    r.Relation2 as relationship,
-    r.RelationshipID as relationshipID1,
-    NULL as relationshipID2,
-    n.AltNum as numbering,
-    n.Description as descriptionNumbering
-FROM Objects o,
-    Associations a
-INNER JOIN
-    Relationships r ON r.RelationshipID = a.RelationshipID
-INNER JOIN
-    Objects obj ON obj.ObjectID = a.ID2
-LEFT JOIN
-    AltNums n ON n.ID = a.ID2 AND n.Description = 'paginanummer'
-WHERE
-    o.ObjectID = a.ID1
-)
-UNION
-(
-SELECT DISTINCT o.ObjectID as _id,
-    obj.ObjectNumber as relatedObjectNumber,
-    r.Relation1 as relationship,
-    NULL as relationshipID1,
-    r.RelationshipID as relationshipID2,
-    n.AltNum as numbering,
-    n.Description as descriptionNumbering
-FROM Objects o,
-    Associations a
-INNER JOIN
-    Relationships r ON r.RelationshipID = a.RelationshipID
-INNER JOIN
-    Objects obj ON obj.ObjectID = a.ID1
-LEFT JOIN
-    AltNums n ON n.ID = a.ID1 AND n.Description = 'paginanummer'
-WHERE
-    o.ObjectID = a.ID2
-);
+    SELECT *,
+    IF(relatedObjectNumber LIKE '%/%', SUBSTRING(relatedObjectNumber, 1, INSTR(relatedObjectNumber, '/') - 1), relatedObjectNumber) AS beforeSlash, 
+    IF(relatedObjectNumber LIKE '%/%', SUBSTRING(relatedObjectNumber, INSTR(relatedObjectNumber, '/') + 1), 0) AS afterSlash
+    FROM
+    (
+        (
+        SELECT DISTINCT o.ObjectID as _id,
+            obj.ObjectNumber as relatedObjectNumber,
+            r.Relation2 as relationship,
+            r.RelationshipID as relationshipID1,
+            NULL as relationshipID2,
+            n.AltNum as numbering,
+            n.Description as descriptionNumbering
+        FROM Objects o,
+            Associations a
+        INNER JOIN
+            Relationships r ON r.RelationshipID = a.RelationshipID
+        INNER JOIN
+            Objects obj ON obj.ObjectID = a.ID2
+        LEFT JOIN
+            AltNums n ON n.ID = a.ID2 AND n.Description = 'paginanummer'
+        WHERE
+            o.ObjectID = a.ID1
+        )
+        UNION
+        (
+        SELECT DISTINCT o.ObjectID as _id,
+            obj.ObjectNumber as relatedObjectNumber,
+            r.Relation1 as relationship,
+            NULL as relationshipID1,
+            r.RelationshipID as relationshipID2,
+            n.AltNum as numbering,
+            n.Description as descriptionNumbering
+        FROM Objects o,
+            Associations a
+        INNER JOIN
+            Relationships r ON r.RelationshipID = a.RelationshipID
+        INNER JOIN
+            Objects obj ON obj.ObjectID = a.ID1
+        LEFT JOIN
+            AltNums n ON n.ID = a.ID1 AND n.Description = 'paginanummer'
+        WHERE
+            o.ObjectID = a.ID2
+        )
+    ) AS rel
+) AS rel1
+ORDER BY
+-CAST(numbering AS UNSIGNED) DESC,
+IF(first REGEXP '^[0-9].*$', LPAD(uf_get_first_digits(first), 30, 0), first),
+CAST(uf_get_first_digits(second) AS UNSIGNED),
+CAST(uf_get_first_digits(third) AS UNSIGNED),
+IF(third LIKE '%(%', CAST(uf_get_first_digits(SUBSTRING_INDEX(third, '(', -1)) AS UNSIGNED), 1),
+CAST(uf_get_first_digits(fourth) AS UNSIGNED),
+relatedObjectNumber,
+_id;
 
 -- VIEW PageNumbers
 
@@ -634,10 +700,11 @@ FROM Objects;
 -- VIEW AAT
 
 CREATE OR REPLACE VIEW vaat AS
-SELECT o.ObjectID as _id,
+SELECT DISTINCT o.ObjectID as _id,
     o.ObjectNumber as objectNumber,
     t.Term as term,
-    c.CN as path
+    c.CN as path,
+    tx.DisplayOrder
 FROM ThesXrefs tx
 INNER JOIN
     Terms t ON tx.TermID = t.TermID
@@ -646,7 +713,8 @@ INNER JOIN
 INNER JOIN
     ClassificationNotations c on t.TermMasterID = c.TermMasterID
 WHERE
-    tx.TableID = '108' AND tx.ThesXrefTypeID = '39'
+    tx.TableID = '108' AND tx.ThesXrefTypeID = '39' AND
+    tx.DisplayOrder = (SELECT MIN(DisplayOrder) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.TermID = t.TermID AND r.TableID = '108' AND r.ThesXrefTypeID = '39')
 ORDER BY tx.DisplayOrder;
 
 -- VIEW LinkLibrary
