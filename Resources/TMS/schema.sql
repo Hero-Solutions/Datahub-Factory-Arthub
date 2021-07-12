@@ -41,12 +41,12 @@ END $$
 
 DROP FUNCTION IF EXISTS `uf_get_first_digits`$$
 
-CREATE FUNCTION `uf_get_first_digits`(as_val VARCHAR(65535))
-RETURNS VARCHAR(65535)
+CREATE FUNCTION `uf_get_first_digits`(as_val VARCHAR(255))
+RETURNS VARCHAR(255)
 DETERMINISTIC
 BEGIN
 
-    DECLARE retval VARCHAR(65535);
+    DECLARE retval VARCHAR(255);
     DECLARE i INT;
     DECLARE strlen INT;
     -- shortcut exit for special cases
