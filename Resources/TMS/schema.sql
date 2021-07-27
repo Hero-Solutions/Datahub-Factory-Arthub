@@ -780,3 +780,17 @@ FROM ObjectNames n
 INNER JOIN
     Objects o ON n.ObjectID = o.ObjectID
 ORDER BY n.DisplayOrder;
+
+-- VIEW Handling
+
+CREATE OR REPLACE VIEW vhandling AS
+SELECT o.ObjectID as _id,
+    REPLACE(t.TextEntry, '\r', '') as textEntry,
+    l.ISO369v1Code as language
+FROM TextEntries t
+INNER JOIN
+    Objects o ON t.ID = o.ObjectID
+INNER JOIN
+    DDLanguages l ON l.LanguageID = t.LanguageID AND l.ISO369v1Code <> ''
+WHERE
+    t.TextTypeID = 116;

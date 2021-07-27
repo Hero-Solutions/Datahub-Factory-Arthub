@@ -85,6 +85,8 @@ sub prepare {
     $self->__acquisition();
     $self->logger->info('Adding "objectnames" temporary table.');
     $self->__objectnames();
+    $self->logger->info('Adding "handling" temporary table.');
+    $self->__handling();
 }
 
 sub prepare_call {
@@ -266,6 +268,11 @@ sub __acquisition {
 sub __objectnames {
     my $self = shift;
     $self->merge_call('SELECT * FROM vobjectnames', 'objectnames', 'objectnames');
+}
+
+sub __handling {
+    my $self = shift;
+    $self->merge_call('SELECT * FROM vhandling', 'handling', 'handling');
 }
 
 1;
