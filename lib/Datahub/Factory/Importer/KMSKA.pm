@@ -87,6 +87,10 @@ sub prepare {
     $self->__objectnames();
     $self->logger->info('Adding "handling" temporary table.');
     $self->__handling();
+    $self->logger->info('Adding "highlights" temporary table.');
+    $self->__highlights();
+    $self->logger->info('Adding "collectionpresentation" temporary table.');
+    $self->__collectionpresentation();
 }
 
 sub prepare_call {
@@ -273,6 +277,16 @@ sub __objectnames {
 sub __handling {
     my $self = shift;
     $self->merge_call('SELECT * FROM vhandling', 'handling', 'handling');
+}
+
+sub __highlights {
+    my $self = shift;
+    $self->prepare_call('SELECT * FROM vhighlights', 'highlights');
+}
+
+sub __collectionpresentation {
+    my $self = shift;
+    $self->prepare_call('SELECT * FROM vcollectionpresentation', 'collectionpresentation');
 }
 
 1;

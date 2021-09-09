@@ -337,6 +337,12 @@ ALTER TABLE `ClassificationNotations` CHANGE `TermMasterID` `TermMasterID` VARCH
 CALL sp_DropIndex ('ClassificationNotations', 'TermMasterID');
 ALTER TABLE `ClassificationNotations` ADD INDEX `TermMasterID` ( `TermMasterID` );
 
+-- StatusFlags
+
+ALTER TABLE `StatusFlags` CHANGE `ObjectID` `ObjectID` VARCHAR( 255 ) NULL DEFAULT NULL;
+CALL sp_DropIndex ('StatusFlags', 'ObjectID');
+ALTER TABLE `StatusFlags` ADD INDEX `ObjectID` ( `ObjectID` );
+
 --
 -- VIEWS
 
@@ -365,13 +371,13 @@ ORDER BY cr.DisplayOrder;
 
 CREATE OR REPLACE VIEW vperiods AS
 SELECT ObjectID as _id,
-    Period as term 
+    Period as term
 FROM ObjContext;
 
 -- VIEW Dimensions
 
 CREATE OR REPLACE VIEW vdimensions AS
-SELECT o.ObjectID as _id, 
+SELECT o.ObjectID as _id,
     d.Dimension as dimension,
     t.DimensionType as type,
     e.Element as element,
@@ -418,7 +424,7 @@ SELECT DISTINCT o.ObjectID as _id,
     t.Term as subject,
     t.TermID,
     x.DisplayOrder
-FROM Terms t, 
+FROM Terms t,
     Objects o,
     ThesXrefs x
 WHERE
@@ -794,3 +800,19 @@ INNER JOIN
     DDLanguages l ON l.LanguageID = t.LanguageID AND l.ISO369v1Code <> ''
 WHERE
     t.TextTypeID = 116;
+
+-- VIEW highlights
+
+CREATE OR REPLACE VIEW vhighlights AS
+SELECT o.ObjectID as _id
+FROM Objects o
+INNER JOIN StatusFlags f ON f.ObjectID = o.ObjectID
+WHERE f.FlagID = 31;
+
+-- VIEW collectionpresentation
+
+CREATE OR REPLACE VIEW vcollectionpresentation AS
+SELECT o.ObjectID as _id
+FROM Objects o
+INNER JOIN StatusFlags f ON f.ObjectID = o.ObjectID
+WHERE f.FlagID = 50;
