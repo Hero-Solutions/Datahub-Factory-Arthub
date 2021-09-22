@@ -355,7 +355,7 @@ ALTER TABLE `AuthorityTranslations` ADD INDEX `ID` ( `ID` );
 -- VIEW Constituents 
 
 CREATE OR REPLACE VIEW vconstituents AS
-SELECT o.ObjectID as _id, o.ObjectNumber, c.ConstituentID, c.AlphaSort, c.DisplayName, c.BeginDate, c.EndDate, c.BeginDateISO, c.EndDateISO, r.Role as role_nl, ta.Translation1 as role_en, ta.Translation2 as role_fr, cr.DisplayOrder,
+SELECT o.ObjectID as _id, o.ObjectNumber, c.ConstituentID, c.AlphaSort, c.DisplayName, c.BeginDate, c.EndDate, c.BeginDateISO, c.EndDateISO, r.Role as role_nl, at.Translation1 as role_en, at.Translation2 as role_fr, cr.DisplayOrder,
     IF(te.TextEntry <> 'CC0', CONCAT(te.TextEntry, ', ', YEAR(NOW())), te.TextEntry) as copyright
 FROM Objects o
    INNER JOIN ConXrefs cr ON cr.ID = o.ObjectID AND cr.TableID = 108 AND cr.RoleTypeID = 1
@@ -363,7 +363,7 @@ FROM Objects o
    LEFT JOIN Roles r ON r.RoleID = cr.RoleID
    INNER JOIN Constituents c ON c.ConstituentID = cd.ConstituentID
    LEFT JOIN TextEntries te ON te.ID = c.ConstituentID AND te.TextTypeID = 64
-   LEFT JOIN AuthorityTranslations at ON r.RoleID = ta.ID
+   LEFT JOIN AuthorityTranslations at ON r.RoleID = at.ID
 ORDER BY cr.DisplayOrder;
 
 -- VIEW Classifications
