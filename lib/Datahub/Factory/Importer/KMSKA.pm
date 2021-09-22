@@ -291,9 +291,9 @@ sub __collectionpresentation {
     $self->prepare_call('SELECT * FROM vcollectionpresentation', 'collectionpresentation');
 }
 
-sub __collectionpresentation {
+sub __translations {
     my $self = shift;
-    $self->prepare_call('SELECT * FROM vtranslations', 'translations');
+    $self->merge_call('SELECT * FROM vtranslations', 'translations');
 }
 
 1;
