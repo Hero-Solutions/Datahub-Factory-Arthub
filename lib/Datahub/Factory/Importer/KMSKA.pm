@@ -91,6 +91,8 @@ sub prepare {
     $self->__highlights();
     $self->logger->info('Adding "collectionpresentation" temporary table.');
     $self->__collectionpresentation();
+    $self->logger->info('Adding "translations" temporary table.');
+    $self->__translations();
 }
 
 sub prepare_call {
@@ -287,6 +289,11 @@ sub __highlights {
 sub __collectionpresentation {
     my $self = shift;
     $self->prepare_call('SELECT * FROM vcollectionpresentation', 'collectionpresentation');
+}
+
+sub __collectionpresentation {
+    my $self = shift;
+    $self->prepare_call('SELECT * FROM vtranslations', 'translations');
 }
 
 1;
