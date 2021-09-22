@@ -343,6 +343,12 @@ ALTER TABLE `StatusFlags` CHANGE `ObjectID` `ObjectID` VARCHAR( 255 ) NULL DEFAU
 CALL sp_DropIndex ('StatusFlags', 'ObjectID');
 ALTER TABLE `StatusFlags` ADD INDEX `ObjectID` ( `ObjectID` );
 
+-- AuthorityTranslations
+
+ALTER TABLE `AuthorityTranslations` CHANGE `ID` `ID` VARCHAR( 255 ) NULL DEFAULT NULL;
+CALL sp_DropIndex ('AuthorityTranslations', 'ID');
+ALTER TABLE `AuthorityTranslations` ADD INDEX `ID` ( `ID` );
+
 --
 -- VIEWS
 
