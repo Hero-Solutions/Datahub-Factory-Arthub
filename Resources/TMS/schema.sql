@@ -355,7 +355,7 @@ ALTER TABLE `AuthorityTranslations` ADD INDEX `ID` ( `ID` );
 -- VIEW Constituents 
 
 CREATE OR REPLACE VIEW vconstituents AS
-SELECT o.ObjectID as _id, o.ObjectNumber, c.ConstituentID, c.AlphaSort, c.DisplayName, c.BeginDate, c.EndDate, c.BeginDateISO, c.EndDateISO, r.Role, cr.DisplayOrder,
+SELECT o.ObjectID as _id, o.ObjectNumber, c.ConstituentID, c.AlphaSort, c.DisplayName, c.BeginDate, c.EndDate, c.BeginDateISO, c.EndDateISO, r.Role as role_nl, ta.Translation1 as role_en, ta.Translation2 as role_fr, cr.DisplayOrder,
     IF(te.TextEntry <> 'CC0', CONCAT(te.TextEntry, ', ', YEAR(NOW())), te.TextEntry) as copyright
 FROM Objects o
    INNER JOIN ConXrefs cr ON cr.ID = o.ObjectID AND cr.TableID = 108 AND cr.RoleTypeID = 1
@@ -363,14 +363,16 @@ FROM Objects o
    LEFT JOIN Roles r ON r.RoleID = cr.RoleID
    INNER JOIN Constituents c ON c.ConstituentID = cd.ConstituentID
    LEFT JOIN TextEntries te ON te.ID = c.ConstituentID AND te.TextTypeID = 64
+   LEFT JOIN AuthorityTranslations at ON r.RoleID = ta.ID
 ORDER BY cr.DisplayOrder;
 
 -- VIEW Classifications
 
 CREATE OR REPLACE VIEW vclassifications AS
-SELECT o.ObjectID as _id, o.ObjectNumber, c.ClassificationID, c.Classification FROM Objects o
+SELECT o.ObjectID as _id, o.ObjectNumber, c.ClassificationID, c.Classification as classification_nl, at.Translation1 as classification_en, at.Translation2 as classification_fr FROM Objects o
   INNER JOIN ClassificationXRefs cr ON o.ObjectID = cr.ID
   INNER JOIN Classifications c ON c.ClassificationID = cr.ClassificationID
+  LEFT JOIN AuthorityTranslations at ON at.ID = c.ClassificationID
 ORDER BY cr.DisplayOrder;
 
 -- VIEW Periods
@@ -655,7 +657,9 @@ WHERE o.ObjectID = a.ID AND a.Description = 'paginanummer';
 
 CREATE OR REPLACE VIEW vlocations AS
 SELECT o.ObjectID as _id,
-    l.Room as room
+    l.Room as room_nl,
+    at.Translation1 as room_en,
+    at.Translation2 as room_fr
 FROM Locations l
 INNER JOIN
     ObjLocations ol ON l.LocationID = ol.LocationID
@@ -663,6 +667,8 @@ INNER JOIN
     ObjComponents oc ON ol.ObjLocationID = oc.CurrentObjLocID
 INNER JOIN
     Objects o ON oc.ObjectID = o.ObjectID
+LEFT JOIN
+    AuthorityTranslations at ON at.ID = l.LocationID
 WHERE
     l.Site = 'publieksruimte';
 
@@ -761,7 +767,9 @@ ORDER BY m.DisplayOrder;
 CREATE OR REPLACE VIEW vacquisition AS
 SELECT o.ObjectID as _id,
     o.ObjectNumber as objectNumber,
-    r.Role as role,
+    r.Role as role_nl,
+    at.Translation1 as role_en,
+    at.Translation2 as role_fr,
     con.DisplayName AS name,
     con.ConstituentID AS constituentID,
     cd.DisplayDate as date
@@ -775,6 +783,8 @@ INNER JOIN
     ConXrefDetails cd ON cd.ConXrefID = c.ConXrefID
 LEFT OUTER JOIN
     Constituents con ON cd.ConstituentID = con.ConstituentID
+LEFT JOIN
+    AuthorityTranslations at ON at.ID = r.RoleID
 WHERE
     c.RoleTypeID = 2 AND c.TableID = 108 AND c.Displayed = 1 AND cd.UnMasked = 1 AND r.Role IS NOT NULL AND con.DisplayName IS NOT NULL
 ORDER BY
@@ -822,3 +832,13 @@ SELECT o.ObjectID as _id
 FROM Objects o
 INNER JOIN StatusFlags f ON f.ObjectID = o.ObjectID
 WHERE f.FlagID = 50;
+
+-- VIEW Translations
+
+CREATE OR REPLACE VIEW vtranslations AS
+SELECT o.ObjectID as _id,
+    REPLACE(t.TextEntry, '\r', '') as textEntry,
+    t.TextTypeID as textTypeID
+FROM Objects o
+INNER JOIN TextEntries t ON t.ID = o.ObjectID
+WHERE t.TableID = 726 AND t.TextTypeID IN(118, 121, 122, 123, 124, 127, 128, 129);
