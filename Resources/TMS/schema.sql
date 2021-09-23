@@ -363,7 +363,7 @@ FROM Objects o
    LEFT JOIN Roles r ON r.RoleID = cr.RoleID
    INNER JOIN Constituents c ON c.ConstituentID = cd.ConstituentID
    LEFT JOIN TextEntries te ON te.ID = c.ConstituentID AND te.TextTypeID = 64
-   LEFT JOIN AuthorityTranslations at ON r.RoleID = at.ID
+   LEFT JOIN AuthorityTranslations at ON (r.RoleID = at.ID AND ta.TableID = 149)
 ORDER BY cr.DisplayOrder;
 
 -- VIEW Classifications
@@ -784,7 +784,7 @@ INNER JOIN
 LEFT OUTER JOIN
     Constituents con ON cd.ConstituentID = con.ConstituentID
 LEFT JOIN
-    AuthorityTranslations at ON at.ID = r.RoleID
+    AuthorityTranslations at ON (at.ID = r.RoleID AND at.TableID = 149)
 WHERE
     c.RoleTypeID = 2 AND c.TableID = 108 AND c.Displayed = 1 AND cd.UnMasked = 1 AND r.Role IS NOT NULL AND con.DisplayName IS NOT NULL
 ORDER BY
