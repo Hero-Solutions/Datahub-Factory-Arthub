@@ -786,7 +786,7 @@ LEFT OUTER JOIN
 LEFT JOIN
     AuthorityTranslations at ON (at.ID = r.RoleID AND at.TableID = 149)
 WHERE
-    c.RoleTypeID = 2 AND c.TableID = 108 AND c.Displayed = 1 AND cd.UnMasked = 1 AND r.Role IS NOT NULL AND con.DisplayName IS NOT NULL
+    c.RoleTypeID = 2 AND c.TableID = 108 AND c.Displayed = 1 AND cd.UnMasked = 1 AND r.Role IS NOT NULL AND con.DisplayName IS NOT NULL AND at.TableID = 149
 ORDER BY
     c.DisplayOrder;
 
