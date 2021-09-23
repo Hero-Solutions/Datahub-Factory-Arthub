@@ -841,4 +841,5 @@ SELECT o.ObjectID as _id,
     t.TextTypeID as textTypeID
 FROM Objects o
 INNER JOIN TextEntries t ON t.ID = o.ObjectID
-WHERE t.TableID = 726 AND t.TextTypeID IN(118, 121, 122, 123, 124, 127, 128, 129);
+WHERE t.TableID = 726 AND t.TextTypeID IN(118, 121, 122, 123, 124, 127, 128, 129)
+GROUP BY CONCAT(_id, textEntry, textTypeID);
