@@ -372,7 +372,7 @@ CREATE OR REPLACE VIEW vclassifications AS
 SELECT o.ObjectID as _id, o.ObjectNumber, c.ClassificationID, c.Classification as classification_nl, at.Translation1 as classification_en, at.Translation2 as classification_fr FROM Objects o
   INNER JOIN ClassificationXRefs cr ON o.ObjectID = cr.ID
   INNER JOIN Classifications c ON c.ClassificationID = cr.ClassificationID
-  LEFT JOIN AuthorityTranslations at ON at.ID = c.ClassificationID
+  LEFT JOIN AuthorityTranslations at ON (at.ID = c.ClassificationID AND at.TableID = 10)
 ORDER BY cr.DisplayOrder;
 
 -- VIEW Periods
@@ -668,7 +668,7 @@ INNER JOIN
 INNER JOIN
     Objects o ON oc.ObjectID = o.ObjectID
 LEFT JOIN
-    AuthorityTranslations at ON at.ID = l.LocationID
+    AuthorityTranslations at ON (at.ID = l.LocationID AND at.TableID = 83)
 WHERE
     l.Site = 'publieksruimte';
 
