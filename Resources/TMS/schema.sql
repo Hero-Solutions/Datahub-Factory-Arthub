@@ -349,6 +349,12 @@ ALTER TABLE `AuthorityTranslations` CHANGE `ID` `ID` VARCHAR( 255 ) NULL DEFAULT
 CALL sp_DropIndex ('AuthorityTranslations', 'ID');
 ALTER TABLE `AuthorityTranslations` ADD INDEX `ID` ( `ID` );
 
+-- TermMasterThes
+
+ALTER TABLE `TermMasterThes` CHANGE `TermMasterID` `TermMasterID` VARCHAR( 255 ) NULL DEFAULT NULL;
+CALL sp_DropIndex ('TermMasterThes', 'TermMasterID');
+ALTER TABLE `TermMasterThes` ADD INDEX `TermMasterID` ( `TermMasterID` );
+
 --
 -- VIEWS
 
@@ -733,6 +739,30 @@ INNER JOIN
 WHERE
     tx.TableID = '108' AND tx.ThesXrefTypeID = '39' AND
     tx.DisplayOrder = (SELECT MIN(DisplayOrder) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.TermID = t.TermID AND r.TableID = '108' AND r.ThesXrefTypeID = '39')
+ORDER BY tx.DisplayOrder;
+
+-- VIEW Iconclass
+
+CREATE OR REPLACE VIEW viconclass AS
+SELECT DISTINCT o.ObjectID AS _id,
+    o.ObjectNumber AS objectNumber,
+    t.Term AS term,
+    c.CN AS path,
+    tx.DisplayOrder,
+    tm.SourceTermID,
+    tm.TermSource
+FROM ThesXrefs AS tx
+INNER JOIN
+    Terms AS t ON tx.TermID = t.TermID
+INNER JOIN
+    Objects AS o ON tx.ID = o.ObjectID
+INNER JOIN
+    ClassificationNotations AS c ON t.TermMasterID = c.TermMasterID
+INNER JOIN
+    TermMasterThes AS tm ON t.TermMasterID = tm.TermMasterID
+WHERE
+    tx.TableID = '108' AND tx.ThesXrefTypeID = '35' AND
+    tx.DisplayOrder = (SELECT MIN(DisplayOrder) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.TermID = t.TermID AND r.TableID = '108' AND r.ThesXrefTypeID = '35')
 ORDER BY tx.DisplayOrder;
 
 -- VIEW LinkLibrary
