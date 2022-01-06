@@ -369,7 +369,7 @@ FROM Objects o
    LEFT JOIN Roles r ON r.RoleID = cr.RoleID
    INNER JOIN Constituents c ON c.ConstituentID = cd.ConstituentID
    LEFT JOIN TextEntries te ON te.ID = c.ConstituentID AND te.TextTypeID = 64
-   LEFT JOIN AuthorityTranslations at ON r.RoleID = at.ID
+   LEFT JOIN AuthorityTranslations at ON (r.RoleID = at.ID AND at.TableID = 149)
 ORDER BY cr.DisplayOrder;
 
 -- VIEW Classifications
@@ -378,7 +378,7 @@ CREATE OR REPLACE VIEW vclassifications AS
 SELECT o.ObjectID as _id, o.ObjectNumber, c.ClassificationID, c.Classification as classification_nl, at.Translation1 as classification_en, at.Translation2 as classification_fr FROM Objects o
   INNER JOIN ClassificationXRefs cr ON o.ObjectID = cr.ID
   INNER JOIN Classifications c ON c.ClassificationID = cr.ClassificationID
-  LEFT JOIN AuthorityTranslations at ON at.ID = c.ClassificationID
+  LEFT JOIN AuthorityTranslations at ON (at.ID = c.ClassificationID AND at.TableID = 10)
 ORDER BY cr.DisplayOrder;
 
 -- VIEW Periods
@@ -674,7 +674,7 @@ INNER JOIN
 INNER JOIN
     Objects o ON oc.ObjectID = o.ObjectID
 LEFT JOIN
-    AuthorityTranslations at ON at.ID = l.LocationID
+    AuthorityTranslations at ON (at.ID = l.LocationID AND at.TableID = 83)
 WHERE
     l.Site = 'publieksruimte';
 
@@ -814,7 +814,7 @@ INNER JOIN
 LEFT OUTER JOIN
     Constituents con ON cd.ConstituentID = con.ConstituentID
 LEFT JOIN
-    AuthorityTranslations at ON at.ID = r.RoleID
+    AuthorityTranslations at ON (at.ID = r.RoleID AND at.TableID = 149)
 WHERE
     c.RoleTypeID = 2 AND c.TableID = 108 AND c.Displayed = 1 AND cd.UnMasked = 1 AND r.Role IS NOT NULL AND con.DisplayName IS NOT NULL AND at.TableID = 149
 ORDER BY
@@ -871,4 +871,5 @@ SELECT o.ObjectID as _id,
     t.TextTypeID as textTypeID
 FROM Objects o
 INNER JOIN TextEntries t ON t.ID = o.ObjectID
-WHERE t.TableID = 726 AND t.TextTypeID IN(118, 121, 122, 123, 124, 127, 128, 129);
+WHERE t.TableID = 726 AND t.TextTypeID IN(118, 121, 122, 123, 124, 127, 128, 129)
+GROUP BY CONCAT(_id, textEntry, textTypeID);

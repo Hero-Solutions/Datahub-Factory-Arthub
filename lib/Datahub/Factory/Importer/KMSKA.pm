@@ -293,7 +293,7 @@ sub __collectionpresentation {
 
 sub __translations {
     my $self = shift;
-    $self->merge_call('SELECT * FROM vtranslations', 'translations');
+    $self->merge_call('SELECT * FROM vtranslations', 'translations', 'translations');
 }
 
 1;
