@@ -93,6 +93,8 @@ sub prepare {
     $self->__collectionpresentation();
     $self->logger->info('Adding "translations" temporary table.');
     $self->__translations();
+    $self->logger->info('Adding "iconclass" temporary table.');
+    $self->__iconclass();
 }
 
 sub prepare_call {
@@ -294,6 +296,11 @@ sub __collectionpresentation {
 sub __translations {
     my $self = shift;
     $self->merge_call('SELECT * FROM vtranslations', 'translations', 'translations');
+}
+
+sub __iconclass {
+    my $self = shift;
+    $self->merge_call('SELECT * FROM viconclass', 'iconclass', 'iconclass');
 }
 
 1;
