@@ -616,7 +616,7 @@ FROM
         LEFT JOIN
             AltNums n ON n.ID = a.ID2 AND n.Description = 'paginanummer'
         WHERE
-            o.ObjectID = a.ID1
+            o.ObjectID = a.ID1 AND r.RelationshipID <> 8
         )
         UNION
         (
@@ -636,7 +636,7 @@ FROM
         LEFT JOIN
             AltNums n ON n.ID = a.ID1 AND n.Description = 'paginanummer'
         WHERE
-            o.ObjectID = a.ID2
+            o.ObjectID = a.ID2 AND r.RelationshipID <> 8
         )
     ) AS rel
 ) AS rel1
