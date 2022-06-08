@@ -926,4 +926,4 @@ FROM TextEntries AS te
 INNER JOIN Exhibitions AS e ON e.ExhibitionID = te.ID
 INNER JOIN ExhibitionTitles AS et ON et.ExhibitionTitleID = e.ExhibitionTitleID
 INNER JOIN TextTypes AS tt ON tt.TextTypeID = te.TextTypeID
-WHERE e.ProjectNumber = 'Collectiepresentatie2022' AND te.Remarks IS NOT NULL;
+WHERE e.ProjectNumber = 'Collectiepresentatie2022' AND te.Remarks IS NOT NULL AND te.Remarks <> '';
