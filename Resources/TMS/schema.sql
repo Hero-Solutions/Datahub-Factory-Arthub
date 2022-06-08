@@ -379,8 +379,8 @@ ALTER TABLE `ExhObjXrefs` ADD INDEX `ObjectID` ( `ObjectID` );
 -- ExhibitionTitles
 
 ALTER TABLE `ExhibitionTitles` CHANGE `ExhibitionTitleID` `ExhibitionTitleID` VARCHAR(255) NULL DEFAULT NULL;
-CALL sp_DropIndex ('ExhObjXrefs', 'ExhibitionTitleID');
-ALTER TABLE `ExhObjXrefs` ADD INDEX `ExhibitionID` ( `ExhibitionTitleID` );
+CALL sp_DropIndex ('ExhibitionTitles', 'ExhibitionTitleID');
+ALTER TABLE `ExhibitionTitles` ADD INDEX `ExhibitionTitleID` ( `ExhibitionTitleID` );
 
 
 --
