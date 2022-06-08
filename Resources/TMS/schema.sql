@@ -1,15 +1,15 @@
--- 
+--
 -- KMSKA Optimizations to the MySQL database
 --
 -- These optimisations are geared towards the KMSKA Catmandu Fix as part of the
 -- Arthub platform. These queries will add a set of indices to the MySQL tables,
 -- and a set of views to ease up querying the data.
 --
--- You will need to import these SQL file before attempting to run the 
+-- You will need to import these SQL file before attempting to run the
 -- Datahub::Factory::Arthub.
 --
 
--- 
+--
 -- INDEXES
 
 -- Procedure to drop indexes, but only if they already exist
@@ -355,10 +355,38 @@ ALTER TABLE `TermMasterThes` CHANGE `TermMasterID` `TermMasterID` VARCHAR( 255 )
 CALL sp_DropIndex ('TermMasterThes', 'TermMasterID');
 ALTER TABLE `TermMasterThes` ADD INDEX `TermMasterID` ( `TermMasterID` );
 
+-- Exhibitions
+
+ALTER TABLE `Exhibitions` CHANGE `ExhibitionID` `ExhibitionID` VARCHAR(255) NULL DEFAULT NULL;
+ALTER TABLE `Exhibitions` CHANGE `ProjectNumber` `ProjectNumber` VARCHAR(255) NULL DEFAULT NULL;
+ALTER TABLE `Exhibitions` CHANGE `ExhibitionTitleID` `ExhibitionTitleID` VARCHAR(255) NULL DEFAULT NULL;
+CALL sp_DropIndex ('Exhibitions', 'ExhibitionID');
+ALTER TABLE `Exhibitions` ADD INDEX `ExhibitionID` ( `ExhibitionID` );
+CALL sp_DropIndex ('Exhibitions', 'ProjectNumber');
+ALTER TABLE `Exhibitions` ADD INDEX `ProjectNumber` ( `ProjectNumber` );
+CALL sp_DropIndex ('Exhibitions', 'ExhibitionTitleID');
+ALTER TABLE `Exhibitions` ADD INDEX `ExhibitionTitleID` ( `ExhibitionTitleID` );
+
+-- ExhObjXrefs
+
+ALTER TABLE `ExhObjXrefs` CHANGE `ExhibitionID` `ExhibitionID` VARCHAR(255) NULL DEFAULT NULL;
+ALTER TABLE `ExhObjXrefs` CHANGE `ObjectID` `ObjectID` VARCHAR(255) NULL DEFAULT NULL;
+CALL sp_DropIndex ('ExhObjXrefs', 'ExhibitionID');
+ALTER TABLE `ExhObjXrefs` ADD INDEX `ExhibitionID` ( `ExhibitionID` );
+CALL sp_DropIndex ('ExhObjXrefs', 'ObjectID');
+ALTER TABLE `ExhObjXrefs` ADD INDEX `ObjectID` ( `ObjectID` );
+
+-- ExhibitionTitles
+
+ALTER TABLE `ExhibitionTitles` CHANGE `ExhibitionTitleID` `ExhibitionTitleID` VARCHAR(255) NULL DEFAULT NULL;
+CALL sp_DropIndex ('ExhObjXrefs', 'ExhibitionTitleID');
+ALTER TABLE `ExhObjXrefs` ADD INDEX `ExhibitionID` ( `ExhibitionTitleID` );
+
+
 --
 -- VIEWS
 
--- VIEW Constituents 
+-- VIEW Constituents
 
 CREATE OR REPLACE VIEW vconstituents AS
 SELECT o.ObjectID as _id, o.ObjectNumber, c.ConstituentID, c.AlphaSort, c.DisplayName, c.BeginDate, c.EndDate, c.BeginDateISO, c.EndDateISO, r.Role as role_nl, at.Translation1 as role_en, at.Translation2 as role_fr, cr.DisplayOrder,
@@ -421,7 +449,7 @@ SELECT DISTINCT o.ObjectID as _id,
     t.Term as object,
     t.TermID,
     x.DisplayOrder
-FROM Terms t, 
+FROM Terms t,
     Objects o,
     ThesXrefs x
 WHERE
@@ -455,7 +483,7 @@ SELECT DISTINCT o.ObjectID as _id,
     t.Term as material,
     t.TermID,
     x.DisplayOrder
-FROM Terms t, 
+FROM Terms t,
     Objects o,
     ThesXrefs x
 WHERE
@@ -485,40 +513,40 @@ ORDER BY x.DisplayOrder;
 -- VIEW Data PIDS
 
 CREATE OR REPLACE VIEW vdatapids AS
-SELECT o.ObjectNumber as _id, 
-    ref.ID, 
+SELECT o.ObjectNumber as _id,
+    ref.ID,
     ref.fieldValue as dataPid
 FROM UserFieldXrefs ref
-INNER JOIN 
+INNER JOIN
     Objects o ON o.ObjectID = ref.ID
 WHERE userFieldID = '44';
 
 -- VIEW Work PIDS
 
 CREATE OR REPLACE VIEW vworkpids AS
-SELECT o.ObjectNumber as _id, 
-    ref.ID, 
+SELECT o.ObjectNumber as _id,
+    ref.ID,
     ref.fieldValue as workPid
 FROM UserFieldXrefs ref
-INNER JOIN 
+INNER JOIN
     Objects o ON o.ObjectID = ref.ID
 WHERE userFieldID = '46';
 
 -- VIEW Representation PIDS
 
 CREATE OR REPLACE VIEW vrepresentationpids AS
-SELECT o.ObjectNumber as _id, 
-    ref.ID, 
+SELECT o.ObjectNumber as _id,
+    ref.ID,
     ref.fieldValue as representationPid
 FROM UserFieldXrefs ref
-INNER JOIN 
+INNER JOIN
     Objects o ON o.ObjectID = ref.ID
 WHERE userFieldID = '48';
 
 -- VIEW ObjTitles
 
 CREATE OR REPLACE VIEW vobjtitles AS
-SELECT obj.ObjectNumber as _id, 
+SELECT obj.ObjectNumber as _id,
     tit.titleID as titleid,
     tit.Title as title,
     l.ISO369v1Code as language,
@@ -595,7 +623,7 @@ IF(afterSlash LIKE '%-%', SUBSTRING(afterSlash, INSTR(afterSlash, '-') + 1), 999
 FROM
 (
     SELECT *,
-    IF(relatedObjectNumber LIKE '%/%', SUBSTRING(relatedObjectNumber, 1, INSTR(relatedObjectNumber, '/') - 1), relatedObjectNumber) AS beforeSlash, 
+    IF(relatedObjectNumber LIKE '%/%', SUBSTRING(relatedObjectNumber, 1, INSTR(relatedObjectNumber, '/') - 1), relatedObjectNumber) AS beforeSlash,
     IF(relatedObjectNumber LIKE '%/%', SUBSTRING(relatedObjectNumber, INSTR(relatedObjectNumber, '/') + 1), 0) AS afterSlash
     FROM
     (
@@ -871,5 +899,31 @@ SELECT o.ObjectID as _id,
     t.TextTypeID as textTypeID
 FROM Objects o
 INNER JOIN TextEntries t ON t.ID = o.ObjectID
-WHERE t.TableID = 726 AND t.TextTypeID IN(118, 121, 122, 123, 124, 127, 128, 129)
+WHERE t.TableID = 726 AND t.TextTypeID BETWEEN 118 AND 179
 GROUP BY CONCAT(_id, textEntry, textTypeID);
+
+-- VIEW Exhibitions
+
+CREATE OR REPLACE VIEW vexhibitions AS
+SELECT eo.ObjectID AS _id,
+    eo.ExhibitionID AS exhibitionID,
+    o.ObjectNumber AS objectNumber
+FROM ExhObjXrefs AS eo
+INNER JOIN Exhibitions AS e ON e.ExhibitionID = eo.ExhibitionID
+INNER JOIN Objects AS o ON o.ObjectID = eo.ObjectID
+WHERE e.ProjectNumber = 'Collectiepresentatie2022';
+
+-- VIEW ExhibitionTexts
+
+CREATE OR REPLACE VIEW vexhibitiontexts AS
+SELECT e.ExhibitionID AS _id,
+    et.Title AS title,
+    te.Remarks AS name,
+    te.TextEntry AS textEntry,
+    tt.TextTypeID AS textTypeID,
+    tt.TextType AS textType
+FROM TextEntries AS te
+INNER JOIN Exhibitions AS e ON e.ExhibitionID = te.ID
+INNER JOIN ExhibitionTitles AS et ON et.ExhibitionTitleID = e.ExhibitionTitleID
+INNER JOIN TextTypes AS tt ON tt.TextTypeID = te.TextTypeID
+WHERE e.ProjectNumber = 'Collectiepresentatie2022' AND te.Remarks IS NOT NULL;
