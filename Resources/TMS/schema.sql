@@ -913,6 +913,15 @@ INNER JOIN Exhibitions AS e ON e.ExhibitionID = eo.ExhibitionID
 INNER JOIN Objects AS o ON o.ObjectID = eo.ObjectID
 WHERE e.ProjectNumber = 'Collectiepresentatie2022';
 
+-- VIEW ExhibitionTitles
+
+CREATE OR REPLACE VIEW vexhibitiontitles AS
+SELECT e.ExhibitionID AS _id,
+    et.Title AS title
+FROM Exhibitions AS e
+INNER JOIN ExhibitionTitles AS et ON et.ExhibitionTitleID = e.ExhibitionTitleID
+WHERE e.ProjectNumber = 'Collectiepresentatie2022';
+
 -- VIEW ExhibitionTexts
 
 CREATE OR REPLACE VIEW vexhibitiontexts AS
@@ -922,8 +931,17 @@ SELECT e.ExhibitionID AS _id,
     te.TextEntry AS textEntry,
     tt.TextTypeID AS textTypeID,
     tt.TextType AS textType
-FROM TextEntries AS te
-INNER JOIN Exhibitions AS e ON e.ExhibitionID = te.ID
+FROM Exhibitions AS e
 INNER JOIN ExhibitionTitles AS et ON et.ExhibitionTitleID = e.ExhibitionTitleID
+INNER JOIN TextEntries AS te ON te.ID = e.ExhibitionID
 INNER JOIN TextTypes AS tt ON tt.TextTypeID = te.TextTypeID
-WHERE e.ProjectNumber = 'Collectiepresentatie2022' AND te.Remarks IS NOT NULL AND te.Remarks <> '';
+WHERE e.ProjectNumber = 'Collectiepresentatie2022' AND tt.TextTypeID IN(162, 164, 165, 166, 167, 168, 169, 170, 171);
+
+-- VIEW AppNumbers
+
+CREATE OR REPLACE VIEW vappnumbers AS
+SELECT o.ObjectID as _id,
+    a.AltNum as appNumber
+FROM Objects AS o
+INNER JOIN AltNums AS a ON o.ObjectID = a.ID
+WHERE a.Description = 'App nr';

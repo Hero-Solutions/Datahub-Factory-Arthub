@@ -95,6 +95,8 @@ sub prepare {
     $self->__translations();
     $self->logger->info('Adding "iconclass" temporary table.');
     $self->__iconclass();
+    $self->logger->info('Adding "appnumbers" temporary table.');
+    $self->__appnumbers();
 }
 
 sub prepare_call {
@@ -301,6 +303,11 @@ sub __translations {
 sub __iconclass {
     my $self = shift;
     $self->merge_call('SELECT * FROM viconclass', 'iconclass', 'iconclass');
+}
+
+sub __appnumbers {
+    my $self = shift;
+    $self->prepare_call('SELECT * FROM vappnumbers', 'appnumbers', 'appnumbers');
 }
 
 1;
