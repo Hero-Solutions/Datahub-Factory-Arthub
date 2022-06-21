@@ -899,7 +899,7 @@ SELECT o.ObjectID as _id,
     t.TextTypeID as textTypeID
 FROM Objects o
 INNER JOIN TextEntries t ON t.ID = o.ObjectID
-WHERE t.TableID = 726 AND t.TextTypeID BETWEEN 118 AND 179
+WHERE t.TableID = 726 AND t.TextTypeID BETWEEN 118 AND 188
 GROUP BY CONCAT(_id, textEntry, textTypeID);
 
 -- VIEW Exhibitions

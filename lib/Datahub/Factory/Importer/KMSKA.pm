@@ -307,7 +307,7 @@ sub __iconclass {
 
 sub __appnumbers {
     my $self = shift;
-    $self->prepare_call('SELECT * FROM vappnumbers', 'appnumbers', 'appnumbers');
+    $self->prepare_call('SELECT * FROM vappnumbers', 'appnumbers');
 }
 
 1;
