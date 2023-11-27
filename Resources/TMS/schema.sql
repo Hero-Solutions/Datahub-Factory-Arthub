@@ -172,6 +172,11 @@ ALTER TABLE `Constituents` CHANGE `ConstituentID` `ConstituentID` VARCHAR( 255 )
 CALL sp_DropIndex ('Constituents', 'ConstituentID');
 ALTER TABLE `Constituents` ADD INDEX `ConstituentID` ( `ConstituentID` );
 
+-- ConAltNames
+ALTER TABLE `ConAltNames` CHANGE `ConstituentID` `ConstituentID` VARCHAR( 255 ) NULL DEFAULT NULL;
+CALL sp_DropIndex ('ConAltNames', 'ConstituentID');
+ALTER TABLE `ConAltNames` ADD INDEX `ConstituentID` ( `ConstituentID` );
+
 -- Dimensions
 
 ALTER TABLE `Dimensions` CHANGE `DimItemElemXrefID` `DimItemElemXrefID` VARCHAR( 255 ) NULL DEFAULT NULL;
@@ -389,7 +394,15 @@ ALTER TABLE `ExhibitionTitles` ADD INDEX `ExhibitionTitleID` ( `ExhibitionTitleI
 -- VIEW Constituents
 
 CREATE OR REPLACE VIEW vconstituents AS
-SELECT o.ObjectID as _id, o.ObjectNumber, c.ConstituentID, c.AlphaSort, c.DisplayName, c.BeginDate, c.EndDate, c.BeginDateISO, c.EndDateISO, r.Role as role_nl, at.Translation1 as role_en, at.Translation2 as role_fr, cr.DisplayOrder,
+SELECT o.ObjectID as _id, o.ObjectNumber, c.ConstituentID, c.AlphaSort, c.DisplayName, c.BeginDate,
+    a1.DisplayName AS FrenchDisplay, a1.AlphaSort AS FrenchAlphaSort,
+    a2.DisplayName AS EnglishDisplay, a2.AlphaSort AS EnglishAlphaSort,
+    a3.DisplayName AS GermanDisplay, a3.AlphaSort AS GermanAlphaSort,
+    a4.DisplayName AS ItalianDisplay, a4.AlphaSort AS ItalianAlphaSort,
+    a5.DisplayName AS SpanishDisplay, a5.AlphaSort AS SpanishAlphaSort,
+    a6.DisplayName AS RussianDisplay, a6.AlphaSort AS RussianAlphaSort,
+    a7.DisplayName AS ChineseDisplay, a7.AlphaSort AS ChineseAlphaSort,
+    c.EndDate, c.BeginDateISO, c.EndDateISO, r.Role as role_nl, at.Translation1 as role_en, at.Translation2 as role_fr, cr.DisplayOrder,
     IF(te.TextEntry <> 'CC0', CONCAT(te.TextEntry, ', ', YEAR(NOW())), te.TextEntry) as copyright
 FROM Objects o
    INNER JOIN ConXrefs cr ON cr.ID = o.ObjectID AND cr.TableID = 108 AND cr.RoleTypeID = 1
@@ -398,6 +411,13 @@ FROM Objects o
    INNER JOIN Constituents c ON c.ConstituentID = cd.ConstituentID
    LEFT JOIN TextEntries te ON te.ID = c.ConstituentID AND te.TextTypeID = 64
    LEFT JOIN AuthorityTranslations at ON (r.RoleID = at.ID AND at.TableID = 149)
+   LEFT JOIN ConAltNames a1 ON(a1.ConstituentID = c.ConstituentID AND a1.NameType = 'Frans')
+   LEFT JOIN ConAltNames a2 ON(a2.ConstituentID = c.ConstituentID AND a2.NameType = 'Engels')
+   LEFT JOIN ConAltNames a3 ON(a3.ConstituentID = c.ConstituentID AND a3.NameType = 'Duits')
+   LEFT JOIN ConAltNames a4 ON(a4.ConstituentID = c.ConstituentID AND a4.NameType = 'Italiaans')
+   LEFT JOIN ConAltNames a5 ON(a5.ConstituentID = c.ConstituentID AND a5.NameType = 'Spaans')
+   LEFT JOIN ConAltNames a6 ON(a6.ConstituentID = c.ConstituentID AND a6.NameType = 'Russisch')
+   LEFT JOIN ConAltNames a7 ON(a7.ConstituentID = c.ConstituentID AND a7.NameType = 'Chinees')
 ORDER BY cr.DisplayOrder;
 
 -- VIEW Classifications
@@ -456,7 +476,7 @@ WHERE
     x.ID = o.ObjectID AND
     x.TermID = t.TermID AND
     x.ThesXrefTypeID = 3 AND
-    x.DisplayOrder = (SELECT MIN(DisplayOrder) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.TermID = t.TermID AND r.ThesXrefTypeID = 3)
+    x.DisplayOrder = (SELECT MIN(DisplayOrder) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.ThesXrefTypeID = 3)
 ORDER BY x.DisplayOrder;
 
 -- VIEW Subjects
@@ -473,7 +493,7 @@ WHERE
     x.TermID = t.TermID AND
     x.ID = o.ObjectID AND
     x.ThesXrefTypeID = 30 AND
-    x.DisplayOrder = (SELECT MIN(DisplayOrder) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.TermID = t.TermID AND r.ThesXrefTypeID = 30)
+    x.DisplayOrder = (SELECT MIN(DisplayOrder) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.ThesXrefTypeID = 30)
 ORDER BY x.DisplayOrder;
 
 -- VIEW Materials
@@ -490,7 +510,7 @@ WHERE
     x.TermID = t.TermID AND
     x.ID = o.ObjectID AND
     x.ThesXrefTypeID = 5 AND
-    x.DisplayOrder = (SELECT MIN(DisplayOrder) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.TermID = t.TermID AND r.ThesXrefTypeID = 5)
+    x.DisplayOrder = (SELECT MIN(DisplayOrder) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.ThesXrefTypeID = 5)
 ORDER BY x.DisplayOrder;
 
 -- VIEW Techniques
@@ -507,7 +527,7 @@ WHERE
     x.TermID = t.TermID AND
     x.ID = o.ObjectID AND
     x.ThesXrefTypeID = 6 AND
-    x.DisplayOrder = (SELECT MIN(DisplayOrder) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.TermID = t.TermID AND r.ThesXrefTypeID = 6)
+    x.DisplayOrder = (SELECT MIN(DisplayOrder) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.ThesXrefTypeID = 6)
 ORDER BY x.DisplayOrder;
 
 -- VIEW Data PIDS
@@ -766,7 +786,7 @@ INNER JOIN
     ClassificationNotations c on t.TermMasterID = c.TermMasterID
 WHERE
     tx.TableID = '108' AND tx.ThesXrefTypeID = '39' AND
-    tx.DisplayOrder = (SELECT MIN(DisplayOrder) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.TermID = t.TermID AND r.TableID = '108' AND r.ThesXrefTypeID = '39')
+    tx.DisplayOrder = (SELECT MIN(DisplayOrder) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.TableID = '108' AND r.ThesXrefTypeID = '39')
 ORDER BY tx.DisplayOrder;
 
 -- VIEW Iconclass
@@ -790,7 +810,7 @@ INNER JOIN
     TermMasterThes AS tm ON t.TermMasterID = tm.TermMasterID
 WHERE
     tx.TableID = '108' AND tx.ThesXrefTypeID = '35' AND
-    tx.DisplayOrder = (SELECT MIN(DisplayOrder) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.TermID = t.TermID AND r.TableID = '108' AND r.ThesXrefTypeID = '35')
+    tx.DisplayOrder = (SELECT MIN(DisplayOrder) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.TableID = '108' AND r.ThesXrefTypeID = '35')
 ORDER BY tx.DisplayOrder;
 
 -- VIEW LinkLibrary
