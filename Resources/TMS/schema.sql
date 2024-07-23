@@ -418,10 +418,13 @@ ALTER TABLE `vgsrpSurveyAttrTypesS_RO` ADD INDEX `AttributeTypeID` ( `AttributeT
 
 ALTER TABLE `vgsrpCondLineItemsS_RO` CHANGE `AttributeTypeID` `AttributeTypeID` VARCHAR(255) NULL DEFAULT NULL;
 ALTER TABLE `vgsrpCondLineItemsS_RO` CHANGE `ConditionID` `ConditionID` VARCHAR(255) NULL DEFAULT NULL;
+ALTER TABLE `vgsrpCondLineItemsS_RO` CHANGE `SURVEYTYPEID` `SURVEYTYPEID` VARCHAR(255) NULL DEFAULT NULL;
 CALL sp_DropIndex ('vgsrpCondLineItemsS_RO', 'AttributeTypeID');
 ALTER TABLE `vgsrpCondLineItemsS_RO` ADD INDEX `AttributeTypeID` ( `AttributeTypeID` );
 CALL sp_DropIndex ('vgsrpCondLineItemsS_RO', 'ConditionID');
 ALTER TABLE `vgsrpCondLineItemsS_RO` ADD INDEX `ConditionID` ( `ConditionID` );
+CALL sp_DropIndex ('vgsrpCondLineItemsS_RO', 'SURVEYTYPEID');
+ALTER TABLE `vgsrpCondLineItemsS_RO` ADD INDEX `SURVEYTYPEID` ( `SURVEYTYPEID` );
 
 --
 -- VIEWS
