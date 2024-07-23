@@ -387,6 +387,41 @@ ALTER TABLE `ExhibitionTitles` CHANGE `ExhibitionTitleID` `ExhibitionTitleID` VA
 CALL sp_DropIndex ('ExhibitionTitles', 'ExhibitionTitleID');
 ALTER TABLE `ExhibitionTitles` ADD INDEX `ExhibitionTitleID` ( `ExhibitionTitleID` );
 
+-- HistEvents
+
+ALTER TABLE `HistEvents` CHANGE `HistEventID` `HistEventID` VARCHAR(255) NULL DEFAULT NULL;
+CALL sp_DropIndex ('HistEvents', 'HistEventID');
+ALTER TABLE `HistEvents` ADD INDEX `HistEventID` ( `HistEventID` );
+
+-- VGSRPCONDITIONSS_RO
+
+ALTER TABLE `VGSRPCONDITIONSS_RO` CHANGE `ConditionID` `ConditionID` VARCHAR(255) NULL DEFAULT NULL;
+ALTER TABLE `VGSRPCONDITIONSS_RO` CHANGE `ID` `ID` VARCHAR(255) NULL DEFAULT NULL;
+CALL sp_DropIndex ('VGSRPCONDITIONSS_RO', 'ConditionID');
+ALTER TABLE `VGSRPCONDITIONSS_RO` ADD INDEX `ConditionID` ( `ConditionID` );
+CALL sp_DropIndex ('VGSRPCONDITIONSS_RO', 'ID');
+ALTER TABLE `VGSRPCONDITIONSS_RO` ADD INDEX `ID` ( `ID` );
+
+-- vgsrpSurveyTypesS_RO
+
+ALTER TABLE `vgsrpSurveyTypesS_RO` CHANGE `SurveyTypeID` `SurveyTypeID` VARCHAR(255) NULL DEFAULT NULL;
+CALL sp_DropIndex ('vgsrpSurveyTypesS_RO', 'SurveyTypeID');
+ALTER TABLE `vgsrpSurveyTypesS_RO` ADD INDEX `SurveyTypeID` ( `SurveyTypeID` );
+
+-- vgsrpSurveyAttrTypesS_RO
+
+ALTER TABLE `vgsrpSurveyAttrTypesS_RO` CHANGE `AttributeTypeID` `AttributeTypeID` VARCHAR(255) NULL DEFAULT NULL;
+CALL sp_DropIndex ('vgsrpSurveyAttrTypesS_RO', 'AttributeTypeID');
+ALTER TABLE `vgsrpSurveyAttrTypesS_RO` ADD INDEX `AttributeTypeID` ( `AttributeTypeID` );
+
+-- vgsrpCondLineItemsS_RO
+
+ALTER TABLE `vgsrpCondLineItemsS_RO` CHANGE `AttributeTypeID` `AttributeTypeID` VARCHAR(255) NULL DEFAULT NULL;
+ALTER TABLE `vgsrpCondLineItemsS_RO` CHANGE `ConditionID` `ConditionID` VARCHAR(255) NULL DEFAULT NULL;
+CALL sp_DropIndex ('vgsrpCondLineItemsS_RO', 'AttributeTypeID');
+ALTER TABLE `vgsrpCondLineItemsS_RO` ADD INDEX `AttributeTypeID` ( `AttributeTypeID` );
+CALL sp_DropIndex ('vgsrpCondLineItemsS_RO', 'ConditionID');
+ALTER TABLE `vgsrpCondLineItemsS_RO` ADD INDEX `ConditionID` ( `ConditionID` );
 
 --
 -- VIEWS
@@ -965,3 +1000,46 @@ SELECT o.ObjectID as _id,
 FROM Objects AS o
 INNER JOIN AltNums AS a ON o.ObjectID = a.ID
 WHERE a.Description = 'App nr';
+
+-- VIEW OSCTexts
+
+CREATE OR REPLACE VIEW vosctexts AS
+SELECT h.EventName AS eventName,
+    te.TextEntry AS textEntry,
+    tt.TextType AS textType
+FROM TextTypes tt
+INNER JOIN TextEntries te ON tt.TextTypeID = te.TextTypeID
+INNER JOIN HistEvents h ON te.ID = h.HistEventID
+WHERE tt.TableID = 187 AND h.EventName LIKE 'OSC%';
+
+-- VIEW OSCObjectTexts
+
+CREATE OR REPLACE VIEW voscobjecttexts AS
+SELECT o.ObjectID AS _id,
+    c.PROJECT AS project,
+    st.SurveyType AS surveyType,
+    cl.BriefDescription AS briefDescription,
+    cl.Statement AS statement,
+    cl.Proposal AS footnotes,
+    cl.AttributeTypeID AS attributeTypeID,
+    sa.AttributeType AS attributeType
+FROM VGSRPCONDITIONSS_RO c
+INNER JOIN Objects o ON c.ID = o.ObjectID
+INNER JOIN vgsrpCondLineItemsS_RO cl ON c.CONDITIONID = cl.ConditionID
+INNER JOIN vgsrpSurveyTypesS_RO st ON c.SURVEYTYPEID = st.SurveyTypeID
+INNER JOIN vgsrpSurveyAttrTypesS_RO sa ON cl.AttributeTypeID = sa.AttributeTypeID
+WHERE c.PROJECT LIKE 'OSC%'
+    AND st.SurveyType = 'OSC'
+    AND cl.AttributeTypeID IN(77, 78, 80, 88, 99, 100);
+
+-- VIEW OSCAAT
+
+CREATE OR REPLACE VIEW voscaat AS
+SELECT o.ObjectID AS _id,
+    t.Term AS Term,
+    t.LanguageID AS languageID
+FROM VGSRPCONDITIONSS_RO c
+INNER JOIN ThesXrefs tx ON c.CONDITIONID = tx.ID
+INNER JOIN Terms t ON tx.TermID = t.TermID
+INNER JOIN Objects o ON c.ID = o.ObjectID
+WHERE c.PROJECT LIKE 'OSC%' AND tx.ThesXrefTypeID = 29;
