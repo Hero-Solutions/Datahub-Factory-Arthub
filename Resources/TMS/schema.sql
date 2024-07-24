@@ -426,6 +426,23 @@ ALTER TABLE `vgsrpCondLineItemsS_RO` ADD INDEX `AttributeTypeID` ( `AttributeTyp
 CALL sp_DropIndex ('vgsrpCondLineItemsS_RO', 'ConditionID');
 ALTER TABLE `vgsrpCondLineItemsS_RO` ADD INDEX `ConditionID` ( `ConditionID` );
 
+-- VGSRPMEDIAMASTERS_RO
+
+ALTER TABLE `VGSRPMEDIAMASTERS_RO` CHANGE `MEDIAMASTERID` `MEDIAMASTERID` VARCHAR(255) NULL DEFAULT NULL;
+ALTER TABLE `VGSRPMEDIAMASTERS_RO` CHANGE `PRIMARYRENDID` `PRIMARYRENDID` VARCHAR(255) NULL DEFAULT NULL;
+CALL sp_DropIndex ('VGSRPMEDIAMASTERS_RO', 'MEDIAMASTERID');
+ALTER TABLE `VGSRPMEDIAMASTERS_RO` ADD INDEX `MEDIAMASTERID` ( `MEDIAMASTERID` );
+CALL sp_DropIndex ('VGSRPMEDIAMASTERS_RO', 'PRIMARYRENDID');
+ALTER TABLE `VGSRPMEDIAMASTERS_RO` ADD INDEX `PRIMARYRENDID` ( `PRIMARYRENDID` );
+
+-- MediaPaths
+
+ALTER TABLE `MediaPaths` CHANGE `PathID` `PathID` VARCHAR(255) NULL DEFAULT NULL;
+CALL sp_DropIndex ('MediaPaths', 'PathID');
+ALTER TABLE `MediaPaths` ADD INDEX `PathID` ( `PathID` );
+
+--
+
 --
 -- VIEWS
 
@@ -1009,6 +1026,7 @@ WHERE a.Description = 'App nr';
 CREATE OR REPLACE VIEW vosctexts AS
 SELECT h.EventName AS eventName,
     te.TextEntry AS textEntry,
+    te.LanguageID AS languageID,
     tt.TextType AS textType
 FROM TextTypes tt
 INNER JOIN TextEntries te ON tt.TextTypeID = te.TextTypeID
@@ -1020,20 +1038,18 @@ WHERE tt.TableID = 187 AND h.EventName LIKE 'OSC%';
 CREATE OR REPLACE VIEW voscobjecttexts AS
 SELECT o.ObjectID AS _id,
     c.PROJECT AS project,
-    st.SurveyType AS surveyType,
     cl.BriefDescription AS briefDescription,
     cl.Statement AS statement,
     cl.Proposal AS footnotes,
-    cl.AttributeTypeID AS attributeTypeID,
     sa.AttributeType AS attributeType
-FROM VGSRPCONDITIONSS_RO c
-INNER JOIN Objects o ON c.ID = o.ObjectID
+FROM Objects o
+INNER JOIN VGSRPCONDITIONSS_RO c ON o.ObjectID = c.ID
 INNER JOIN vgsrpCondLineItemsS_RO cl ON c.CONDITIONID = cl.ConditionID
 INNER JOIN vgsrpSurveyTypesS_RO st ON c.SURVEYTYPEID = st.SurveyTypeID
 INNER JOIN vgsrpSurveyAttrTypesS_RO sa ON cl.AttributeTypeID = sa.AttributeTypeID
 WHERE c.PROJECT LIKE 'OSC%'
     AND st.SurveyType = 'OSC'
-    AND cl.AttributeTypeID IN(77, 78, 80, 88, 99, 100);
+    AND cl.AttributeTypeID IN(77, 78, 80, 88, 99, 100, 101);
 
 -- VIEW OSCAAT
 
@@ -1046,3 +1062,22 @@ INNER JOIN ThesXrefs tx ON c.CONDITIONID = tx.ID
 INNER JOIN Terms t ON tx.TermID = t.TermID
 INNER JOIN Objects o ON c.ID = o.ObjectID
 WHERE c.PROJECT LIKE 'OSC%' AND tx.ThesXrefTypeID = 29;
+
+-- VIEW OSCManifests
+
+CREATE OR REPLACE VIEW voscmanifests AS
+SELECT o.ObjectID AS _id,
+    CONCAT(mp.Path, mf.FileName) AS manifest
+FROM Objects o
+    INNER JOIN VGSRPCONDITIONSS_RO c ON c.ID = o.ObjectID
+    INNER JOIN vgsrpCondLineItemsS_RO cl ON c.CONDITIONID = cl.ConditionID
+    INNER JOIN vgsrpSurveyTypesS_RO st ON c.SURVEYTYPEID = st.SurveyTypeID
+    INNER JOIN vgsrpSurveyAttrTypesS_RO sa ON cl.AttributeTypeID = sa.AttributeTypeID
+    INNER JOIN MediaXrefs mx ON cl.CondLineItemID = mx.ID
+    INNER JOIN VGSRPMEDIAMASTERS_RO mm ON mx.MediaMasterID = mm.MEDIAMASTERID
+    INNER JOIN MediaFiles mf ON mm.PRIMARYRENDID = mf.RenditionID
+    INNER JOIN MediaPaths mp ON mf.PathID = mp.PathID
+WHERE c.PROJECT LIKE 'OSC%'
+    AND st.SurveyType = 'OSC'
+    AND cl.AttributeTypeID = 101
+    AND sa.AttributeType = 'research image';
