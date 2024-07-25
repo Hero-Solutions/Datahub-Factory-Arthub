@@ -421,10 +421,13 @@ ALTER TABLE `vgsrpSurveyAttrTypesS_RO` ADD INDEX `AttributeTypeID` ( `AttributeT
 
 ALTER TABLE `vgsrpCondLineItemsS_RO` CHANGE `AttributeTypeID` `AttributeTypeID` VARCHAR(255) NULL DEFAULT NULL;
 ALTER TABLE `vgsrpCondLineItemsS_RO` CHANGE `ConditionID` `ConditionID` VARCHAR(255) NULL DEFAULT NULL;
+ALTER TABLE `vgsrpCondLineItemsS_RO` CHANGE `CondLineItemID` `CondLineItemID` VARCHAR(255) NULL DEFAULT NULL;
 CALL sp_DropIndex ('vgsrpCondLineItemsS_RO', 'AttributeTypeID');
 ALTER TABLE `vgsrpCondLineItemsS_RO` ADD INDEX `AttributeTypeID` ( `AttributeTypeID` );
 CALL sp_DropIndex ('vgsrpCondLineItemsS_RO', 'ConditionID');
 ALTER TABLE `vgsrpCondLineItemsS_RO` ADD INDEX `ConditionID` ( `ConditionID` );
+CALL sp_DropIndex ('vgsrpCondLineItemsS_RO', 'CondLineItemID');
+ALTER TABLE `vgsrpCondLineItemsS_RO` ADD INDEX `CondLineItemID` ( `CondLineItemID` );
 
 -- VGSRPMEDIAMASTERS_RO
 
@@ -440,6 +443,12 @@ ALTER TABLE `VGSRPMEDIAMASTERS_RO` ADD INDEX `PRIMARYRENDID` ( `PRIMARYRENDID` )
 ALTER TABLE `MediaPaths` CHANGE `PathID` `PathID` VARCHAR(255) NULL DEFAULT NULL;
 CALL sp_DropIndex ('MediaPaths', 'PathID');
 ALTER TABLE `MediaPaths` ADD INDEX `PathID` ( `PathID` );
+
+-- OSCCitaatvormen
+
+ALTER TABLE `OSCCitaatvormen` CHANGE `ConditionID` `ConditionID` VARCHAR(255) NULL DEFAULT NULL;
+CALL sp_DropIndex ('OSCCitaatvormen', 'ConditionID');
+ALTER TABLE `OSCCitaatvormen` ADD INDEX `ConditionID` ( `ConditionID` );
 
 --
 
@@ -1081,3 +1090,16 @@ WHERE c.PROJECT LIKE 'OSC%'
     AND st.SurveyType = 'OSC'
     AND cl.AttributeTypeID = 101
     AND sa.AttributeType = 'research image';
+
+-- VIEW OSCCitations
+
+CREATE OR REPLACE VIEW vosccitations AS
+SELECT o.ObjectID as _id,
+    ocv.TextType AS textType,
+    ocv.TextEntry AS textEntry
+FROM Objects o
+    INNER JOIN VGSRPCONDITIONSS_RO c ON o.ObjectID = c.ID
+    INNER JOIN vgsrpSurveyTypesS_RO st ON c.SURVEYTYPEID = st.SurveyTypeID
+    INNER JOIN OSCCitaatvormen ocv ON c.CONDITIONID = ocv.ConditionID
+WHERE c.PROJECT LIKE 'OSC%'
+    AND st.SurveyType = 'OSC';
