@@ -1047,6 +1047,7 @@ WHERE tt.TableID = 187 AND h.EventName LIKE 'OSC%';
 CREATE OR REPLACE VIEW voscobjecttexts AS
 SELECT o.ObjectID AS _id,
     c.PROJECT AS project,
+    c.REPORTISODATE AS date,
     cl.BriefDescription AS briefDescription,
     cl.Statement AS statement,
     cl.Proposal AS footnotes,
@@ -1057,8 +1058,7 @@ INNER JOIN vgsrpCondLineItemsS_RO cl ON c.CONDITIONID = cl.ConditionID
 INNER JOIN vgsrpSurveyTypesS_RO st ON c.SURVEYTYPEID = st.SurveyTypeID
 INNER JOIN vgsrpSurveyAttrTypesS_RO sa ON cl.AttributeTypeID = sa.AttributeTypeID
 WHERE c.PROJECT LIKE 'OSC%'
-    AND st.SurveyType = 'OSC'
-    AND cl.AttributeTypeID IN(77, 78, 80, 88, 99, 100, 101);
+    AND st.SurveyType = 'OSC';
 
 -- VIEW OSCAAT
 
