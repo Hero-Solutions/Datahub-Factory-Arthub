@@ -884,8 +884,7 @@ INNER JOIN
 INNER JOIN
     TermMasterThes AS tm ON t.TermMasterID = tm.TermMasterID
 WHERE
-    tx.TableID = '108' AND tx.ThesXrefTypeID = '35' AND
-    tx.DisplayOrder = (SELECT MIN(DisplayOrder) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.TableID = '108' AND r.ThesXrefTypeID = '35')
+    tx.TableID = '108' AND tx.ThesXrefTypeID = '35'
 ORDER BY tx.DisplayOrder;
 
 -- VIEW LinkLibrary
