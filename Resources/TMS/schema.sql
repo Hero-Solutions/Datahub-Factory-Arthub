@@ -276,6 +276,12 @@ ALTER TABLE `AltNums` CHANGE `ID` `ID` VARCHAR( 255 ) NULL DEFAULT NULL;
 CALL sp_DropIndex ('AltNums', 'AltNumID');
 ALTER TABLE `AltNums` ADD INDEX `AltNumID` ( `AltNumID` , `ID` );
 
+-- AltNumDescriptions
+
+ALTER TABLE `AltNumDescriptions` CHANGE `AltNumDescriptionID` `AltNumDescriptionID` VARCHAR( 255 ) NULL DEFAULT NULL;
+CALL sp_DropIndex ('AltNumDescriptions', 'AltNumDescriptionID');
+ALTER TABLE `AltNumDescriptions` ADD INDEX `AltNumDescriptionID` ( `AltNumDescriptionID` );
+
 -- Departments
 
 ALTER TABLE `Departments` CHANGE `DepartmentID` `DepartmentID` VARCHAR( 255 ) NULL DEFAULT NULL;
@@ -726,7 +732,9 @@ FROM
         INNER JOIN
             Objects obj ON obj.ObjectID = a.ID2
         LEFT JOIN
-            AltNums n ON n.ID = a.ID2 AND n.Description = 'paginanummer'
+            AltNums n ON n.ID = a.ID2
+        LEFT JOIN
+            AltNumDescriptions ad ON n.AltNumDescriptionID = ad.AltNumDescriptionID AND ad.AltNumDescription = 'paginanummer'
         WHERE
             o.ObjectID = a.ID1 AND r.RelationshipID <> 8
         )
@@ -746,7 +754,9 @@ FROM
         INNER JOIN
             Objects obj ON obj.ObjectID = a.ID1
         LEFT JOIN
-            AltNums n ON n.ID = a.ID1 AND n.Description = 'paginanummer'
+            AltNums n ON n.ID = a.ID1
+        LEFT JOIN
+            AltNumDescriptions ad ON n.AltNumDescriptionID = ad.AltNumDescriptionID AND ad.AltNumDescription = 'paginanummer'
         WHERE
             o.ObjectID = a.ID2 AND r.RelationshipID <> 8
         )
@@ -768,8 +778,9 @@ CREATE OR REPLACE VIEW vpagenumbers AS
 SELECT o.ObjectID as _id,
     a.AltNum as pageNumber
 FROM Objects o,
-    AltNums a
-WHERE o.ObjectID = a.ID AND a.Description = 'paginanummer';
+    AltNums a,
+    AltNumDescriptions ad
+WHERE o.ObjectID = a.ID AND ad.AltNumDescription = 'paginanummer';
 
 -- VIEW Locations
 
@@ -1028,7 +1039,8 @@ SELECT o.ObjectID as _id,
     a.AltNum as appNumber
 FROM Objects AS o
 INNER JOIN AltNums AS a ON o.ObjectID = a.ID
-WHERE a.Description = 'App nr';
+LEFT JOIN AltNumDescriptions AS ad ON a.AltNumDescriptionID = ad.AltNumDescriptionID
+WHERE ad.AltNumDescription = 'App nr';
 
 -- VIEW OSCTexts
 
