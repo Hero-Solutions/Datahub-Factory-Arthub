@@ -724,7 +724,7 @@ FROM
             r.RelationshipID as relationshipID1,
             NULL as relationshipID2,
             n.AltNum as numbering,
-            n.Description as descriptionNumbering
+            ad.AltNumDescription as descriptionNumbering
         FROM Objects o,
             Associations a
         INNER JOIN
@@ -746,7 +746,7 @@ FROM
             NULL as relationshipID1,
             r.RelationshipID as relationshipID2,
             n.AltNum as numbering,
-            n.Description as descriptionNumbering
+            ad.AltNumDescription as descriptionNumbering
         FROM Objects o,
             Associations a
         INNER JOIN
