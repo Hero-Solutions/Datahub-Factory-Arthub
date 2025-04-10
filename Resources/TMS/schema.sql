@@ -488,7 +488,7 @@ FROM Objects o
    LEFT JOIN ConAltNames a5 ON(a5.ConstituentID = c.ConstituentID AND a5.NameType = 'Spaans')
    LEFT JOIN ConAltNames a6 ON(a6.ConstituentID = c.ConstituentID AND a6.NameType = 'Russisch')
    LEFT JOIN ConAltNames a7 ON(a7.ConstituentID = c.ConstituentID AND a7.NameType = 'Chinees')
-ORDER BY cr.DisplayOrder;
+ORDER BY CAST(cr.DisplayOrder AS SIGNED);
 
 -- VIEW Classifications
 
@@ -497,7 +497,7 @@ SELECT o.ObjectID as _id, o.ObjectNumber, c.ClassificationID, c.Classification a
   INNER JOIN ClassificationXRefs cr ON o.ObjectID = cr.ID
   INNER JOIN Classifications c ON c.ClassificationID = cr.ClassificationID
   LEFT JOIN AuthorityTranslations at ON (at.ID = c.ClassificationID AND at.TableID = 10)
-ORDER BY cr.DisplayOrder;
+ORDER BY CAST(cr.DisplayOrder AS SIGNED);
 
 -- VIEW Periods
 
@@ -546,8 +546,8 @@ WHERE
     x.ID = o.ObjectID AND
     x.TermID = t.TermID AND
     x.ThesXrefTypeID = 3 AND
-    x.DisplayOrder = (SELECT MIN(DisplayOrder) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.ThesXrefTypeID = 3)
-ORDER BY x.DisplayOrder;
+    x.DisplayOrder = (SELECT MIN(CAST(DisplayOrder AS SIGNED)) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.ThesXrefTypeID = 3)
+ORDER BY CAST(x.DisplayOrder AS SIGNED);
 
 -- VIEW Subjects
 
@@ -563,8 +563,8 @@ WHERE
     x.TermID = t.TermID AND
     x.ID = o.ObjectID AND
     x.ThesXrefTypeID = 30 AND
-    x.DisplayOrder = (SELECT MIN(DisplayOrder) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.ThesXrefTypeID = 30)
-ORDER BY x.DisplayOrder;
+    x.DisplayOrder = (SELECT MIN(CAST(DisplayOrder AS SIGNED)) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.ThesXrefTypeID = 30)
+ORDER BY CAST(x.DisplayOrder AS SIGNED);
 
 -- VIEW Materials
 
@@ -580,8 +580,8 @@ WHERE
     x.TermID = t.TermID AND
     x.ID = o.ObjectID AND
     x.ThesXrefTypeID = 5 AND
-    x.DisplayOrder = (SELECT MIN(DisplayOrder) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.ThesXrefTypeID = 5)
-ORDER BY x.DisplayOrder;
+    x.DisplayOrder = (SELECT MIN(CAST(DisplayOrder AS SIGNED)) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.ThesXrefTypeID = 5)
+ORDER BY CAST(x.DisplayOrder AS SIGNED);
 
 -- VIEW Techniques
 
@@ -597,8 +597,8 @@ WHERE
     x.TermID = t.TermID AND
     x.ID = o.ObjectID AND
     x.ThesXrefTypeID = 6 AND
-    x.DisplayOrder = (SELECT MIN(DisplayOrder) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.ThesXrefTypeID = 6)
-ORDER BY x.DisplayOrder;
+    x.DisplayOrder = (SELECT MIN(CAST(DisplayOrder AS SIGNED)) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.ThesXrefTypeID = 6)
+ORDER BY CAST(x.DisplayOrder AS SIGNED);
 
 -- VIEW Data PIDS
 
@@ -660,12 +660,12 @@ LEFT JOIN
                 SELECT ObjTitles.ObjectID,
                     ObjTitles.LanguageID,
                     ObjTitles.TitleTypeID,
-                    MIN(ObjTitles.DisplayOrder) as displayorder
+                    MIN(CAST(ObjTitles.DisplayOrder AS SIGNED)) as displayorder
                 FROM
                     (
                         SELECT ObjectID,
                             LanguageID,
-                            MIN(TitleTypeID) as TitleTypeID
+                            MIN(CAST(TitleTypeID AS SIGNED)) as TitleTypeID
                         FROM
                             ObjTitles
                         WHERE
@@ -689,7 +689,7 @@ LEFT JOIN
     ) AS tit ON tit.ObjectID = obj.ObjectID
 INNER JOIN
     DDLanguages l ON l.LanguageID = tit.LanguageID AND l.ISO369v1Code <> ''
-ORDER BY tit.DisplayOrder;
+ORDER BY CAST(tit.DisplayOrder AS SIGNED);
 
 -- VIEW Departments
 
@@ -861,8 +861,8 @@ INNER JOIN
     ClassificationNotations c on t.TermMasterID = c.TermMasterID
 WHERE
     tx.TableID = '108' AND tx.ThesXrefTypeID = '39' AND
-    tx.DisplayOrder = (SELECT MIN(DisplayOrder) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.TableID = '108' AND r.ThesXrefTypeID = '39')
-ORDER BY tx.DisplayOrder;
+    tx.DisplayOrder = (SELECT MIN(CAST(DisplayOrder AS SIGNED)) FROM ThesXrefs AS r WHERE r.ID = o.ObjectID AND r.TableID = '108' AND r.ThesXrefTypeID = '39')
+ORDER BY CAST(tx.DisplayOrder AS SIGNED);
 
 -- VIEW Iconclass
 
@@ -885,7 +885,7 @@ INNER JOIN
     TermMasterThes AS tm ON t.TermMasterID = tm.TermMasterID
 WHERE
     tx.TableID = '108' AND tx.ThesXrefTypeID = '35'
-ORDER BY tx.DisplayOrder;
+ORDER BY CAST(tx.DisplayOrder AS SIGNED);
 
 -- VIEW LinkLibrary
 
@@ -912,7 +912,7 @@ INNER JOIN
     MediaFiles mf ON mr.RenditionID = mf.RenditionID
 WHERE
     m.TableID = '108' AND mf.PathID = 23
-ORDER BY m.DisplayOrder;
+ORDER BY CAST(m.DisplayOrder AS SIGNED);
 
 -- VIEW Acquisition
 
@@ -940,7 +940,7 @@ LEFT JOIN
 WHERE
     c.RoleTypeID = 2 AND c.TableID = 108 AND c.Displayed = 1 AND cd.UnMasked = 1 AND r.Role IS NOT NULL AND con.DisplayName IS NOT NULL AND at.TableID = 149
 ORDER BY
-    c.DisplayOrder;
+    CAST(c.DisplayOrder AS SIGNED);
 
 -- VIEW ObjectNames
 
@@ -953,7 +953,7 @@ SELECT o.ObjectID as _id,
 FROM ObjectNames n
 INNER JOIN
     Objects o ON n.ObjectID = o.ObjectID
-ORDER BY n.DisplayOrder;
+ORDER BY CAST(n.DisplayOrder AS SIGNED);
 
 -- VIEW Handling
 
