@@ -777,10 +777,12 @@ _id;
 CREATE OR REPLACE VIEW vpagenumbers AS
 SELECT o.ObjectID as _id,
     a.AltNum as pageNumber
-FROM Objects o,
-    AltNums a,
-    AltNumDescriptions ad
-WHERE o.ObjectID = a.ID AND ad.AltNumDescription = 'paginanummer';
+FROM Objects o
+LEFT JOIN
+    AltNums a ON a.ID = o.ObjectID
+LEFT JOIN
+    AltNumDescriptions ad ON ad.AltNumDescriptionID = a.AltNumDescriptionID
+WHERE ad.AltNumDescription = 'paginanummer';
 
 -- VIEW Locations
 
