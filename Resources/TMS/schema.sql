@@ -472,7 +472,7 @@ SELECT o.ObjectID as _id, o.ObjectNumber, c.ConstituentID, c.AlphaSort, c.Displa
     a5.DisplayName AS SpanishDisplay, a5.AlphaSort AS SpanishAlphaSort,
     a6.DisplayName AS RussianDisplay, a6.AlphaSort AS RussianAlphaSort,
     a7.DisplayName AS ChineseDisplay, a7.AlphaSort AS ChineseAlphaSort,
-    c.EndDate, c.BeginDateISO, c.EndDateISO, r.Role as role_nl, at.Translation1 as role_en, at.Translation2 as role_fr, cr.DisplayOrder,
+    c.EndDate, c.BeginDateISO, c.EndDateISO, c.DisplayDate, r.Role as role_nl, at.Translation1 as role_en, at.Translation2 as role_fr, cr.DisplayOrder,
     IF(te.TextEntry <> 'CC0', CONCAT(te.TextEntry, ', ', YEAR(NOW())), te.TextEntry) as copyright
 FROM Objects o
    INNER JOIN ConXrefs cr ON cr.ID = o.ObjectID AND cr.TableID = 108 AND cr.RoleTypeID = 1
